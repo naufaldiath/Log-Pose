@@ -3,6 +3,7 @@ import { spawn as cpSpawn, type ChildProcess } from 'child_process';
 import { EventEmitter } from 'events';
 import { config } from '../utils/config.js';
 import type { ClaudeSession, ServerMessage } from '../types/index.js';
+import { createWorktree, cleanupWorktree, worktreeExists, getWorktreePath } from './worktree.js';
 
 /**
  * Claude PTY Session Manager
@@ -32,6 +33,7 @@ export interface TabInfo {
   name: string;
   state: ClaudeSession['state'];
   createdAt: Date;
+  branch?: string;
 }
 
 class ClaudeSessionManager extends EventEmitter {
@@ -76,7 +78,8 @@ class ClaudeSessionManager extends EventEmitter {
     repoPath: string,
     name?: string,
     cols?: number,
-    rows?: number
+    rows?: number,
+    branch?: string
   ): Promise<ClaudeSession> {
     // Check user session limit
     const userSessionCount = this.getUserSessionCount(userEmail);
@@ -96,6 +99,18 @@ class ClaudeSessionManager extends EventEmitter {
     const existingSessionIds = this.userRepoSessions.get(userRepoKey) || new Set();
     const tabName = name || this.generateTabName(repoId, Array.from(existingSessionIds));
 
+    // Handle branch isolation with worktrees
+    let worktreePath: string | undefined;
+    if (branch) {
+      try {
+        worktreePath = await createWorktree(repoPath, userEmail, branch);
+        console.log(`[ClaudeSession] Created worktree for ${userEmail}/${branch}: ${worktreePath}`);
+      } catch (error) {
+        console.error(`[ClaudeSession] Failed to create worktree for ${branch}:`, error);
+        throw new Error(`Failed to create worktree for branch '${branch}': ${error}`);
+      }
+    }
+
     // Create new session
     const session: ClaudeSession = {
       id: sessionId,
@@ -106,6 +121,8 @@ class ClaudeSessionManager extends EventEmitter {
       state: 'starting',
       createdAt: new Date(),
       lastActivityAt: new Date(),
+      branch,
+      worktreePath,
     };
 
     const entry: SessionEntry = {
@@ -157,6 +174,7 @@ class ClaudeSessionManager extends EventEmitter {
           name: entry.session.name,
           state: entry.session.state,
           createdAt: entry.session.createdAt,
+          branch: entry.session.branch,
         });
       }
     }
@@ -183,18 +201,25 @@ class ClaudeSessionManager extends EventEmitter {
   private async spawnClaude(entry: SessionEntry, cols: number = 120, rows: number = 30): Promise<void> {
     const { session } = entry;
 
+    // Determine the working directory - use worktree path if available, otherwise base repo path
+    const workingDir = session.worktreePath || session.repoPath;
+
     try {
       // Spawn bash with node-pty, then exec Claude from within bash
       const ptyProcess = pty.spawn('/bin/bash', ['-c', `exec ${config.CLAUDE_PATH}`], {
         name: 'xterm-256color',
         cols,
         rows,
-        cwd: session.repoPath,
+        cwd: workingDir,
         env: {
           ...process.env,
           TERM: 'xterm-256color',
           LANG: 'en_US.UTF-8',
           HOME: process.env.HOME,
+          // Set git environment variables to ensure correct branch context
+          ...(session.branch && {
+            GIT_BRANCH: session.branch,
+          }),
         },
       });
 
@@ -352,6 +377,7 @@ class ClaudeSessionManager extends EventEmitter {
 
   /**
    * Restarts a session (kills existing Claude, starts new one)
+   * Preserves the worktree/branch context if present
    */
   async restartSession(sessionId: string): Promise<ClaudeSession | null> {
     const entry = this.sessions.get(sessionId);
@@ -369,7 +395,7 @@ class ClaudeSessionManager extends EventEmitter {
     // Clear buffer
     entry.outputBuffer = '';
 
-    // Spawn new Claude
+    // Spawn new Claude in the same worktree (if applicable)
     await this.spawnClaude(entry);
 
     return entry.session;

@@ -130,6 +130,17 @@ export async function getGitBranches(repoId: string): Promise<{ current: string;
   return request<{ current: string; all: string[] }>(`/git/branches?${params}`);
 }
 
+export async function checkoutBranch(
+  repoId: string,
+  branch: string,
+  create?: boolean
+): Promise<{ success: boolean; branch: string; worktreePath: string; message: string }> {
+  return request('/git/checkout', {
+    method: 'POST',
+    body: JSON.stringify({ repoId, branch, create }),
+  });
+}
+
 // Tasks
 export async function getTasks(repoId: string): Promise<{ tasks: string[] }> {
   const params = new URLSearchParams({ repoId });
@@ -156,10 +167,10 @@ export async function getSessions(repoId: string): Promise<{ tabs: TerminalTab[]
   return request<{ tabs: TerminalTab[] }>(`/sessions?${params}`);
 }
 
-export async function createSession(repoId: string, name?: string): Promise<TerminalTab> {
+export async function createSession(repoId: string, name?: string, branch?: string): Promise<TerminalTab> {
   return request<TerminalTab>('/sessions', {
     method: 'POST',
-    body: JSON.stringify({ repoId, name }),
+    body: JSON.stringify({ repoId, name, branch }),
   });
 }
 

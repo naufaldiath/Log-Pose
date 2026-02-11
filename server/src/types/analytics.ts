@@ -39,6 +39,7 @@ export type AnalyticsEventType =
   | 'git_status_viewed'
   | 'git_diff_viewed'
   | 'git_log_viewed'
+  | 'git_checkout'
   // Task Runner
   | 'task_started'
   | 'task_completed'

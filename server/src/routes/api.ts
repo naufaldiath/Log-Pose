@@ -4,7 +4,8 @@ import { requireAuth } from '../middleware/auth.js';
 import { discoverRepos, resolveRepoId } from '../services/repo.js';
 import { listDirectory, readFile, writeFile, deleteFile } from '../services/file.js';
 import { searchRepo } from '../services/search.js';
-import { getStatus, getDiff, getLog, getBranches, isGitRepository } from '../services/git.js';
+import { getStatus, getDiff, getLog, getBranches, isGitRepository, branchExists } from '../services/git.js';
+import { createWorktree, createWorktreeFromBranch, createWorktreeWithNewBranch, getWorktreePath, worktreeExists } from '../services/worktree.js';
 import { taskRunner } from '../services/task-runner.js';
 import { auditLogger } from '../services/audit-logger.js';
 import { analyticsLogger } from '../services/analytics-logger.js';
@@ -49,6 +50,12 @@ const taskRunBodySchema = z.object({
 
 const taskStopBodySchema = z.object({
   runId: z.string().min(1),
+});
+
+const gitCheckoutBodySchema = z.object({
+  repoId: z.string().min(1),
+  branch: z.string().min(1).max(100),
+  create: z.boolean().optional(), // Create new branch if doesn't exist
 });
 
 /**
@@ -275,17 +282,69 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/api/git/branches', async (request, reply) => {
     const user = requireAuth(request, reply);
     const query = repoIdSchema.parse(request.query);
-    
+
     const repoPath = await getRepoPath(query.repoId);
-    
+
     if (!(await isGitRepository(repoPath))) {
       return reply.status(400).send({
         error: 'Not a git repository',
       });
     }
-    
+
     const branches = await getBranches(repoPath);
     return branches;
+  });
+
+  // POST /api/git/checkout - Checkout/create a branch with worktree isolation
+  fastify.post('/api/git/checkout', async (request, reply) => {
+    const user = requireAuth(request, reply);
+    const body = gitCheckoutBodySchema.parse(request.body);
+
+    const repoPath = await getRepoPath(body.repoId);
+
+    if (!(await isGitRepository(repoPath))) {
+      return reply.status(400).send({
+        error: 'Not a git repository',
+      });
+    }
+
+    try {
+      let worktreePath: string;
+
+      if (body.create) {
+        // Create new branch and worktree
+        worktreePath = await createWorktreeWithNewBranch(repoPath, user.email, body.branch);
+      } else {
+        // Use existing branch
+        const exists = await branchExists(repoPath, body.branch);
+        if (!exists) {
+          return reply.status(404).send({
+            error: 'Branch not found',
+            message: `Branch '${body.branch}' does not exist. Use create: true to create a new branch.`,
+          });
+        }
+        worktreePath = await createWorktreeFromBranch(repoPath, user.email, body.branch);
+      }
+
+      analyticsLogger.log('git_checkout', user.email, {
+        repoId: body.repoId,
+        branch: body.branch,
+        create: body.create || false,
+      });
+
+      return {
+        success: true,
+        branch: body.branch,
+        worktreePath,
+        message: `Checked out ${body.branch} in isolated worktree`,
+      };
+    } catch (error: any) {
+      console.error('[API] Checkout error:', error);
+      return reply.status(400).send({
+        error: 'Checkout failed',
+        message: error.message,
+      });
+    }
   });
   
   // GET /api/tasks - List available tasks
@@ -385,6 +444,7 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
     const body = z.object({
       repoId: z.string().min(1),
       name: z.string().min(1).max(50).optional(),
+      branch: z.string().min(1).max(100).optional(),
     }).parse(request.body);
 
     const repoPath = await getRepoPath(body.repoId);
@@ -394,7 +454,10 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
         user.email,
         body.repoId,
         repoPath,
-        body.name
+        body.name,
+        undefined,
+        undefined,
+        body.branch
       );
 
       const existingSessions = sessionManager.listSessions(user.email, body.repoId);
@@ -410,6 +473,7 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
         name: session.name,
         state: session.state,
         createdAt: session.createdAt,
+        branch: session.branch,
       };
     } catch (error: any) {
       // Handle session limit errors with clear status codes
@@ -494,6 +558,7 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
       name: session.name,
       state: session.state,
       createdAt: session.createdAt,
+      branch: session.branch,
     }));
 
     return { sessions: sessionsWithRepo };

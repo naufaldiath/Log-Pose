@@ -230,6 +230,10 @@ body {
   @apply px-1.5 sm:px-2 py-0.5 text-xs font-mono bg-midnight-800 text-brass-400 rounded border border-midnight-600 truncate max-w-[80px] sm:max-w-[120px];
 }
 
+.branch-badge {
+  @apply px-1.5 sm:px-2 py-0.5 text-xs font-mono bg-teal-900/50 text-teal-300 rounded border border-teal-700/50 truncate max-w-[100px] sm:max-w-[150px] flex items-center;
+}
+
 .terminal-controls {
   @apply flex items-center gap-2 sm:gap-3 flex-shrink-0;
 }
@@ -321,6 +325,14 @@ body {
 
 .terminal-tab-name {
   @apply truncate flex-1;
+}
+
+.terminal-tab-branch {
+  @apply inline-flex items-center gap-0.5 text-xs text-midnight-400 ml-1;
+}
+
+.terminal-tab.active .terminal-tab-branch {
+  @apply text-brass-200;
 }
 
 .terminal-tab-actions {

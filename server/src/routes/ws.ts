@@ -14,7 +14,8 @@ const clientMessageSchema = z.discriminatedUnion('type', [
     type: z.literal('attach'),
     sessionId: z.string().optional(), // Optional: if not provided, creates new session
     cols: z.number().min(1).max(500).optional(),
-    rows: z.number().min(1).max(200).optional()
+    rows: z.number().min(1).max(200).optional(),
+    branch: z.string().min(1).max(100).optional(), // Optional: git branch for worktree isolation
   }),
   // Limit input data to 64KB per message to prevent DoS
   z.object({ type: z.literal('input'), data: z.string().max(65536) }),
@@ -123,7 +124,8 @@ export const wsRoutes: FastifyPluginAsync = async (fastify) => {
                   repoPath,
                   undefined, // auto-generate name
                   message.cols,
-                  message.rows
+                  message.rows,
+                  message.branch // optional branch for worktree isolation
                 );
               }
 
@@ -139,6 +141,7 @@ export const wsRoutes: FastifyPluginAsync = async (fastify) => {
                   state: result.session.state,
                   sessionId: result.session.id,
                   sessionName: result.session.name,
+                  branch: result.session.branch,
                 });
 
                 // Send replay buffer

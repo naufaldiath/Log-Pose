@@ -6,7 +6,8 @@ import '@xterm/xterm/css/xterm.css';
 import { useAppStore } from '@/stores/app';
 import { useTerminalTabsStore } from '@/stores/terminal-tabs';
 import { MobileKeyBar } from './MobileKeyBar';
-import { Plus, X, Edit2 } from 'lucide-react';
+import { BranchSelector } from './BranchSelector';
+import { Plus, X, Edit2, GitBranch } from 'lucide-react';
 import type { TerminalTab } from '@/types';
 
 type ConnectionState = 'disconnected' | 'connecting' | 'connected';
@@ -26,6 +27,7 @@ export const ClaudeTerminal: React.FC<ClaudeTerminalProps> = ({ showMobileKeyBar
   const [fontSize, setFontSize] = useState(14);
   const [editingTabId, setEditingTabId] = useState<string | null>(null);
   const [editingTabName, setEditingTabName] = useState('');
+  const [showBranchSelector, setShowBranchSelector] = useState(false);
 
   const selectedRepo = useAppStore((state) => state.selectedRepo);
   const user = useAppStore((state) => state.user);
@@ -48,6 +50,9 @@ export const ClaudeTerminal: React.FC<ClaudeTerminalProps> = ({ showMobileKeyBar
 
   const repoId = selectedRepo?.repoId;
 
+  // Get active tab info
+  const activeTab = tabs.find(t => t.id === activeTabId);
+
   // Load tabs when repo changes, create initial tab if none exist
   useEffect(() => {
     const initTabs = async () => {
@@ -58,16 +63,16 @@ export const ClaudeTerminal: React.FC<ClaudeTerminalProps> = ({ showMobileKeyBar
     initTabs();
   }, [repoId, loadTabs]);
 
-  // Create initial tab if no tabs exist after loading
+  // Show branch selector for initial session instead of auto-creating
   useEffect(() => {
-    const createInitialTab = async () => {
-      if (repoId && tabs.length === 0 && !activeTabId) {
-        console.log('[ClaudeTerminal] Creating initial tab for repo:', repoId);
-        await createTab(repoId);
+    const promptForBranch = () => {
+      if (repoId && tabs.length === 0 && !activeTabId && !showBranchSelector) {
+        console.log('[ClaudeTerminal] Prompting for branch selection');
+        setShowBranchSelector(true);
       }
     };
-    createInitialTab();
-  }, [repoId, tabs.length, activeTabId, createTab]);
+    promptForBranch();
+  }, [repoId, tabs.length, activeTabId, showBranchSelector]);
 
   // Debug logging for connection state
   useEffect(() => {
@@ -230,10 +235,12 @@ export const ClaudeTerminal: React.FC<ClaudeTerminalProps> = ({ showMobileKeyBar
       if (fitAddon.current) {
         fitAddon.current.fit();
       }
-      // Send attach message with sessionId
+      // Send attach message with sessionId and branch
       const dims = { cols: term.cols, rows: term.rows };
-      console.log('[ClaudeTerminal] Attaching to session:', activeTabId, 'dims:', dims);
-      ws.send(JSON.stringify({ type: 'attach', sessionId: activeTabId, ...dims }));
+      const activeTab = tabs.find(t => t.id === activeTabId);
+      const branch = activeTab?.branch;
+      console.log('[ClaudeTerminal] Attaching to session:', activeTabId, 'dims:', dims, 'branch:', branch);
+      ws.send(JSON.stringify({ type: 'attach', sessionId: activeTabId, ...dims, branch }));
     };
 
     ws.onmessage = (event) => {
@@ -304,15 +311,23 @@ export const ClaudeTerminal: React.FC<ClaudeTerminalProps> = ({ showMobileKeyBar
     };
   }, [repoId, user?.email, activeTabId]);
 
-  // Handle new tab creation
-  const handleNewTab = async () => {
+  // Handle new tab creation - show branch selector first
+  const handleNewTab = () => {
     if (!repoId) {
       console.error('[ClaudeTerminal] Cannot create tab: no repoId');
       return;
     }
-    console.log('[ClaudeTerminal] Creating new tab for repo:', repoId);
+    console.log('[ClaudeTerminal] Opening branch selector for new tab');
+    setShowBranchSelector(true);
+  };
+
+  // Handle branch selection
+  const handleBranchSelect = async (branch: string) => {
+    if (!repoId) return;
+
+    console.log('[ClaudeTerminal] Creating new tab for repo:', repoId, 'branch:', branch);
     try {
-      const tab = await createTab(repoId);
+      const tab = await createTab(repoId, undefined, branch);
       if (tab) {
         console.log('[ClaudeTerminal] Tab created successfully:', tab.id);
       } else {
@@ -392,8 +407,14 @@ export const ClaudeTerminal: React.FC<ClaudeTerminalProps> = ({ showMobileKeyBar
                   />
                 ) : (
                   <>
-                    <span className="terminal-tab-name" title={tab.name}>
+                    <span className="terminal-tab-name" title={`${tab.name}${tab.branch ? ` (${tab.branch})` : ''}`}>
                       {tab.name}
+                      {tab.branch && (
+                        <span className="terminal-tab-branch">
+                          <GitBranch className="w-3 h-3 inline ml-1" />
+                          {tab.branch}
+                        </span>
+                      )}
                     </span>
                     <div className="terminal-tab-actions">
                       <button
@@ -434,6 +455,12 @@ export const ClaudeTerminal: React.FC<ClaudeTerminalProps> = ({ showMobileKeyBar
           <span>Claude Terminal</span>
           {selectedRepo && (
             <span className="repo-badge">{selectedRepo.name}</span>
+          )}
+          {activeTab?.branch && (
+            <span className="branch-badge" title={`Branch: ${activeTab.branch}`}>
+              <GitBranch className="w-3 h-3 inline mr-1" />
+              {activeTab.branch}
+            </span>
           )}
         </div>
         <div className="terminal-controls">
@@ -486,6 +513,14 @@ export const ClaudeTerminal: React.FC<ClaudeTerminalProps> = ({ showMobileKeyBar
           onFontSizeChange={handleFontSizeChange}
         />
       )}
+
+      {/* Branch Selector Modal */}
+      <BranchSelector
+        repoId={repoId || ''}
+        isOpen={showBranchSelector}
+        onClose={() => setShowBranchSelector(false)}
+        onSelect={handleBranchSelect}
+      />
     </div>
   );
 };

@@ -15,7 +15,7 @@ interface TerminalTabsState {
 
   // Actions
   loadTabs: (repoId: string) => Promise<void>;
-  createTab: (repoId: string, name?: string) => Promise<TerminalTab | null>;
+  createTab: (repoId: string, name?: string, branch?: string) => Promise<TerminalTab | null>;
   closeTab: (sessionId: string) => Promise<void>;
   renameTab: (sessionId: string, name: string) => Promise<void>;
   setActiveTab: (sessionId: string) => void;
@@ -50,11 +50,11 @@ export const useTerminalTabsStore = create<TerminalTabsState>((set, get) => ({
     }
   },
 
-  createTab: async (repoId: string, name?: string) => {
+  createTab: async (repoId: string, name?: string, branch?: string) => {
     set({ isLoading: true, error: null, errorCode: null });
     try {
-      console.log('[terminal-tabs] Creating session for repo:', repoId);
-      const tab = await api.createSession(repoId, name);
+      console.log('[terminal-tabs] Creating session for repo:', repoId, branch ? `branch: ${branch}` : '');
+      const tab = await api.createSession(repoId, name, branch);
       console.log('[terminal-tabs] Session created:', tab.id);
       const { tabs } = get();
       set({

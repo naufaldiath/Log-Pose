@@ -99,7 +99,7 @@ export interface GitCommit {
 
 // WebSocket message types
 export type ClientMessage =
-  | { type: 'attach'; sessionId?: string; cols?: number; rows?: number }
+  | { type: 'attach'; sessionId?: string; cols?: number; rows?: number; branch?: string }
   | { type: 'input'; data: string }
   | { type: 'resize'; cols: number; rows: number }
   | { type: 'ping' }
@@ -107,7 +107,7 @@ export type ClientMessage =
 
 export type ServerMessage =
   | { type: 'output'; data: string }
-  | { type: 'status'; state: 'starting' | 'running' | 'exited'; message?: string; sessionId?: string; sessionName?: string }
+  | { type: 'status'; state: 'starting' | 'running' | 'exited'; message?: string; sessionId?: string; sessionName?: string; branch?: string }
   | { type: 'pong' }
   | { type: 'replay'; data: string }
   | { type: 'error'; message: string };
@@ -123,6 +123,8 @@ export interface ClaudeSession {
   createdAt: Date;
   lastActivityAt: Date;
   exitCode?: number;
+  branch?: string; // Git branch for this session (worktree isolation)
+  worktreePath?: string; // Path to worktree directory (if using branch isolation)
 }
 
 // Tab info for API responses
@@ -131,6 +133,7 @@ export interface TabInfo {
   name: string;
   state: ClaudeSession['state'];
   createdAt: Date;
+  branch?: string; // Git branch for this tab (if using worktree isolation)
 }
 
 // Task types

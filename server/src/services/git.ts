@@ -6,7 +6,7 @@ import type { GitStatus, GitCommit } from '../types/index.js';
  */
 
 // Create a git instance with safety options
-function createGit(repoPath: string): SimpleGit {
+export function createGit(repoPath: string): SimpleGit {
   const options: Partial<SimpleGitOptions> = {
     baseDir: repoPath,
     binary: 'git',
@@ -144,9 +144,143 @@ export async function getBranches(repoPath: string): Promise<{
 }> {
   const git = createGit(repoPath);
   const result = await git.branch();
-  
+
   return {
     current: result.current,
     all: result.all.filter((b) => !b.startsWith('remotes/')),
   };
+}
+
+// Worktree types
+export interface WorktreeInfo {
+  path: string;
+  branch: string;
+  commit: string;
+  isDetached: boolean;
+  isMain: boolean;
+}
+
+/**
+ * Creates a git worktree
+ */
+export async function createWorktree(
+  repoPath: string,
+  worktreePath: string,
+  branch: string,
+  createBranch = false
+): Promise<void> {
+  const git = createGit(repoPath);
+
+  const args = ['worktree', 'add'];
+  if (createBranch) {
+    args.push('-b', branch);
+  } else {
+    args.push('-B', branch); // Force create/reset branch
+  }
+  args.push(worktreePath);
+
+  await git.raw(args);
+}
+
+/**
+ * Lists all worktrees with detailed information
+ */
+export async function worktreeList(repoPath: string): Promise<WorktreeInfo[]> {
+  const git = createGit(repoPath);
+
+  try {
+    const result = await git.raw(['worktree', 'list', '--porcelain']);
+    const worktrees: WorktreeInfo[] = [];
+
+    const lines = result.split('\n');
+    let current: Partial<WorktreeInfo> = {};
+
+    for (const line of lines) {
+      if (line.startsWith('worktree ')) {
+        if (current.path) {
+          worktrees.push(current as WorktreeInfo);
+        }
+        current = {
+          path: line.slice(9),
+          branch: '',
+          commit: '',
+          isDetached: false,
+          isMain: false,
+        };
+      } else if (line.startsWith('branch ')) {
+        current.branch = line.slice(7).replace('refs/heads/', '');
+      } else if (line.startsWith('HEAD ')) {
+        current.commit = line.slice(5);
+      } else if (line === 'detached') {
+        current.isDetached = true;
+      } else if (line === 'bare') {
+        // Skip bare entries
+      }
+    }
+
+    if (current.path) {
+      worktrees.push(current as WorktreeInfo);
+    }
+
+    // Mark the first worktree as main (usually the original repo)
+    if (worktrees.length > 0) {
+      worktrees[0].isMain = true;
+    }
+
+    return worktrees;
+  } catch (error) {
+    console.error('[Git] Error listing worktrees:', error);
+    return [];
+  }
+}
+
+/**
+ * Removes a worktree
+ */
+export async function removeWorktree(
+  repoPath: string,
+  worktreePath: string,
+  force = false
+): Promise<void> {
+  const git = createGit(repoPath);
+
+  const args = ['worktree', 'remove'];
+  if (force) {
+    args.push('--force');
+  }
+  args.push(worktreePath);
+
+  await git.raw(args);
+}
+
+/**
+ * Prunes stale worktree entries
+ */
+export async function pruneWorktrees(repoPath: string): Promise<void> {
+  const git = createGit(repoPath);
+  await git.raw(['worktree', 'prune']);
+}
+
+/**
+ * Checks if a branch exists locally or remotely
+ */
+export async function branchExists(repoPath: string, branch: string): Promise<boolean> {
+  const git = createGit(repoPath);
+
+  try {
+    const result = await git.branch(['-a']);
+    return result.all.some(
+      (b) => b === branch || b === `origin/${branch}` || b === `remotes/origin/${branch}`
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Creates a new branch from HEAD
+ */
+export async function createBranch(repoPath: string, branch: string): Promise<void> {
+  const git = createGit(repoPath);
+  await git.checkoutLocalBranch(branch);
 }

@@ -58,6 +58,7 @@ export interface TerminalTab {
   name: string;
   state: SessionState;
   createdAt: string;
+  branch?: string;
 }
 
 export interface TerminalSession {
@@ -68,7 +69,7 @@ export interface TerminalSession {
 
 // WebSocket message types
 export type ClientMessage =
-  | { type: 'attach'; sessionId?: string; cols?: number; rows?: number }
+  | { type: 'attach'; sessionId?: string; cols?: number; rows?: number; branch?: string }
   | { type: 'input'; data: string }
   | { type: 'resize'; cols: number; rows: number }
   | { type: 'ping' }
@@ -76,7 +77,7 @@ export type ClientMessage =
 
 export type ServerMessage =
   | { type: 'output'; data: string }
-  | { type: 'status'; state: SessionState; message?: string; sessionId?: string; sessionName?: string }
+  | { type: 'status'; state: SessionState; message?: string; sessionId?: string; sessionName?: string; branch?: string }
   | { type: 'pong' }
   | { type: 'replay'; data: string }
   | { type: 'error'; message: string };
@@ -91,6 +92,7 @@ export interface UserSession {
   name: string;
   state: SessionState;
   createdAt: string;
+  branch?: string;
 }
 
 // UI State types
