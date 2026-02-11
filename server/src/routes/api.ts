@@ -7,6 +7,7 @@ import { searchRepo } from '../services/search.js';
 import { getStatus, getDiff, getLog, getBranches, isGitRepository } from '../services/git.js';
 import { taskRunner } from '../services/task-runner.js';
 import { auditLogger } from '../services/audit-logger.js';
+import { analyticsLogger } from '../services/analytics-logger.js';
 import { PathSecurityError } from '../utils/path-safety.js';
 import { sessionManager } from '../services/claude-session.js';
 
@@ -66,12 +67,52 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
   // Error handler for path security errors
   fastify.setErrorHandler((error, request, reply) => {
     if (error instanceof PathSecurityError) {
+      // Log security violation
+      if (request.user) {
+        analyticsLogger.logPathSecurityViolation(
+          request.user.email,
+          error.message,
+          request.method + ' ' + request.url
+        );
+      }
       return reply.status(400).send({
         error: 'Bad Request',
         message: error.message,
       });
     }
     throw error;
+  });
+
+  // Hook to track API request timing
+  fastify.addHook('onRequest', async (request, reply) => {
+    (request as any).analyticsStartTime = Date.now();
+  });
+
+  fastify.addHook('onSend', async (request, reply, payload) => {
+    if (request.user && (request as any).analyticsStartTime) {
+      const durationMs = Date.now() - (request as any).analyticsStartTime;
+      const statusCode = reply.statusCode;
+
+      // Don't track analytics endpoints themselves
+      if (!request.url.startsWith('/api/analytics')) {
+        if (statusCode >= 400) {
+          analyticsLogger.logApiError(
+            request.user.email,
+            request.url,
+            statusCode,
+            `HTTP_${statusCode}`
+          );
+        } else {
+          analyticsLogger.logApiRequest(
+            request.user.email,
+            request.url,
+            request.method,
+            durationMs,
+            statusCode
+          );
+        }
+      }
+    }
   });
   
   // GET /api/me - Get authenticated user info
@@ -94,10 +135,14 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/api/tree', async (request, reply) => {
     const user = requireAuth(request, reply);
     const query = treeQuerySchema.parse(request.query);
-    
+
+    const startTime = Date.now();
     const repoPath = await getRepoPath(query.repoId);
     const tree = await listDirectory(repoPath, query.path);
-    
+    const durationMs = Date.now() - startTime;
+
+    analyticsLogger.logFileTreeLoaded(user.email, query.repoId, tree.entries.length, durationMs);
+
     return tree;
   });
   
@@ -105,12 +150,15 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/api/file', async (request, reply) => {
     const user = requireAuth(request, reply);
     const query = fileQuerySchema.parse(request.query);
-    
+
+    const startTime = Date.now();
     const repoPath = await getRepoPath(query.repoId);
     const file = await readFile(repoPath, query.path);
-    
+    const loadTimeMs = Date.now() - startTime;
+
     auditLogger.logFileRead(user.email, query.repoId, query.path, file.content.length);
-    
+    analyticsLogger.logFileOpened(user.email, query.repoId, query.path, file.content.length, loadTimeMs);
+
     return file;
   });
   
@@ -119,12 +167,15 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
     const user = requireAuth(request, reply);
     const query = fileQuerySchema.parse(request.query);
     const body = z.object({ content: z.string() }).parse(request.body);
-    
+
+    const startTime = Date.now();
     const repoPath = await getRepoPath(query.repoId);
     const result = await writeFile(repoPath, query.path, body.content);
-    
+    const durationMs = Date.now() - startTime;
+
     auditLogger.logFileWrite(user.email, query.repoId, query.path, result.bytesWritten);
-    
+    analyticsLogger.logFileSaved(user.email, query.repoId, query.path, result.bytesWritten, durationMs);
+
     return result;
   });
   
@@ -132,12 +183,13 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.delete('/api/file', async (request, reply) => {
     const user = requireAuth(request, reply);
     const query = fileQuerySchema.parse(request.query);
-    
+
     const repoPath = await getRepoPath(query.repoId);
     await deleteFile(repoPath, query.path);
-    
+
     auditLogger.logFileDelete(user.email, query.repoId, query.path);
-    
+    analyticsLogger.logFileDeleted(user.email, query.repoId, query.path, false);
+
     return { ok: true };
   });
   
@@ -145,12 +197,22 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.post('/api/search', async (request, reply) => {
     const user = requireAuth(request, reply);
     const body = searchBodySchema.parse(request.body);
-    
+
+    const startTime = Date.now();
     const repoPath = await getRepoPath(body.repoId);
     const results = await searchRepo(repoPath, body.query, body.paths);
-    
+    const durationMs = Date.now() - startTime;
+
     auditLogger.logSearch(user.email, body.repoId, body.query, results.matches.length);
-    
+    analyticsLogger.logSearchPerformed(
+      user.email,
+      body.repoId,
+      results.matches.length,
+      durationMs,
+      body.query.includes('regex:') || body.query.includes('.*'),
+      !!body.paths && body.paths.length > 0
+    );
+
     return results;
   });
   
@@ -158,16 +220,17 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/api/git/status', async (request, reply) => {
     const user = requireAuth(request, reply);
     const query = repoIdSchema.parse(request.query);
-    
+
     const repoPath = await getRepoPath(query.repoId);
-    
+
     if (!(await isGitRepository(repoPath))) {
       return reply.status(400).send({
         error: 'Not a git repository',
       });
     }
-    
+
     const status = await getStatus(repoPath);
+    analyticsLogger.logGitStatusViewed(user.email, query.repoId);
     return status;
   });
   
@@ -175,16 +238,18 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/api/git/diff', async (request, reply) => {
     const user = requireAuth(request, reply);
     const query = gitDiffQuerySchema.parse(request.query);
-    
+
     const repoPath = await getRepoPath(query.repoId);
-    
+
     if (!(await isGitRepository(repoPath))) {
       return reply.status(400).send({
         error: 'Not a git repository',
       });
     }
-    
+
     const diff = await getDiff(repoPath, query.path);
+    const fileCount = diff ? diff.split('diff --git').length - 1 : 0;
+    analyticsLogger.logGitDiffViewed(user.email, query.repoId, fileCount);
     return { diff };
   });
   
@@ -192,16 +257,17 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/api/git/log', async (request, reply) => {
     const user = requireAuth(request, reply);
     const query = gitLogQuerySchema.parse(request.query);
-    
+
     const repoPath = await getRepoPath(query.repoId);
-    
+
     if (!(await isGitRepository(repoPath))) {
       return reply.status(400).send({
         error: 'Not a git repository',
       });
     }
-    
+
     const commits = await getLog(repoPath, query.limit);
+    analyticsLogger.logGitLogViewed(user.email, query.repoId);
     return { commits };
   });
   
@@ -237,12 +303,36 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.post('/api/tasks/run', async (request, reply) => {
     const user = requireAuth(request, reply);
     const body = taskRunBodySchema.parse(request.body);
-    
+
     const repoPath = await getRepoPath(body.repoId);
     const run = await taskRunner.runTask(body.repoId, repoPath, body.taskId, user.email);
-    
+
     auditLogger.logTaskStart(user.email, body.repoId, body.taskId, run.runId);
-    
+    analyticsLogger.logTaskStarted(user.email, body.repoId, body.taskId, run.runId);
+
+    // Track task completion
+    const taskStartTime = Date.now();
+    const checkTaskCompletion = () => {
+      const task = taskRunner.getTask(run.runId);
+      if (task && (task.state === 'completed' || task.state === 'failed' || task.state === 'stopped')) {
+        const durationMs = Date.now() - taskStartTime;
+        analyticsLogger.logTaskCompleted(
+          user.email,
+          body.repoId,
+          body.taskId,
+          run.runId,
+          durationMs,
+          task.exitCode
+        );
+      } else if (task) {
+        // Task still running, check again in 1 second
+        setTimeout(checkTaskCompletion, 1000);
+      }
+    };
+
+    // Start checking for completion
+    setTimeout(checkTaskCompletion, 1000);
+
     return run;
   });
   
@@ -307,6 +397,14 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
         body.name
       );
 
+      const existingSessions = sessionManager.listSessions(user.email, body.repoId);
+      analyticsLogger.logTerminalTabCreated(
+        user.email,
+        body.repoId,
+        session.id,
+        existingSessions.length <= 1
+      );
+
       return {
         id: session.id,
         name: session.name,
@@ -316,6 +414,8 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
     } catch (error: any) {
       // Handle session limit errors with clear status codes
       if (error.message?.includes('Maximum sessions per user reached')) {
+        const userSessions = sessionManager.getUserSessions(user.email);
+        analyticsLogger.logTerminalMaxSessions(user.email, body.repoId, userSessions.length);
         return reply.status(429).send({
           error: 'Session Limit Reached',
           message: error.message,
@@ -344,6 +444,9 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(404).send({ error: 'Session not found' });
     }
 
+    const sessionAgeMs = Date.now() - session.createdAt.getTime();
+    analyticsLogger.logSessionDeleted(user.email, session.repoId, sessionAgeMs);
+
     sessionManager.terminateSession(sessionId);
     return { ok: true };
   });
@@ -363,6 +466,12 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     const success = sessionManager.renameSession(sessionId, body.name);
+    if (success) {
+      analyticsLogger.log('terminal_tab_renamed', user.email, {
+        repoId: session.repoId,
+        sessionId,
+      });
+    }
     return { ok: success };
   });
 
@@ -375,6 +484,8 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
     // Get repo names for each session
     const repos = await discoverRepos();
     const repoMap = new Map(repos.map(r => [r.repoId, r.name]));
+
+    analyticsLogger.logSessionManagerOpened(user.email, repos.length, sessions.length);
 
     const sessionsWithRepo = sessions.map(session => ({
       id: session.id,

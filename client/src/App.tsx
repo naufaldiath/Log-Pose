@@ -7,6 +7,7 @@ import { ClaudeTerminal } from '@/components/ClaudeTerminal';
 import { SearchPanel } from '@/components/SearchPanel';
 import { ResizablePanel } from '@/components/ResizablePanel';
 import { SessionManagerModal } from '@/components/SessionManagerModal';
+import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
 import {
   Menu,
   Search,
@@ -18,7 +19,8 @@ import {
   FileCode,
   Terminal,
   Keyboard,
-  Settings
+  Settings,
+  BarChart3
 } from 'lucide-react';
 
 function ErrorBanner() {
@@ -87,6 +89,8 @@ function MainLayout() {
     const saved = localStorage.getItem('logpose-keybar-visible');
     return saved ? JSON.parse(saved) : true; // Default to visible on mobile
   });
+  // Analytics dashboard state
+  const [showAnalytics, setShowAnalytics] = useState(false);
 
   // Save keybar state to localStorage
   const toggleKeyBar = () => {
@@ -197,6 +201,15 @@ function MainLayout() {
           </button>
         )}
 
+        {/* Analytics button - admin only */}
+        <button
+          onClick={() => setShowAnalytics(true)}
+          className="p-2 hover:bg-midnight-800 rounded text-midnight-300 hover:text-midnight-100"
+          title="Analytics Dashboard"
+        >
+          <BarChart3 size={20} />
+        </button>
+
         {/* Manage Sessions button */}
         <button
           onClick={() => setSessionManagerOpen(true)}
@@ -267,6 +280,11 @@ function MainLayout() {
         isOpen={isSessionManagerOpen}
         onClose={() => setSessionManagerOpen(false)}
       />
+
+      {/* Analytics Dashboard */}
+      {showAnalytics && (
+        <AnalyticsDashboard onClose={() => setShowAnalytics(false)} />
+      )}
     </div>
   );
 }

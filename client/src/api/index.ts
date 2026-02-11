@@ -1,4 +1,16 @@
 import type { User, RepoInfo, TreeResponse, FileResponse, SearchResponse, GitStatus, GitCommit, TerminalTab, UserSession } from '@/types';
+import type {
+  AnalyticsSummaryResponse,
+  TimeSeriesResponse,
+  FeatureAdoptionResponse,
+  PerformanceMetricsResponse,
+  TopReposResponse,
+  ErrorsResponse,
+  EventsResponse,
+  AnalyticsEventType,
+  UsersResponse,
+  UserDetail
+} from '@/types/analytics';
 
 const API_BASE = '/api';
 
@@ -166,6 +178,74 @@ export async function renameSession(sessionId: string, name: string): Promise<{ 
 
 export async function getAllUserSessions(): Promise<{ sessions: UserSession[] }> {
   return request<{ sessions: UserSession[] }>('/sessions/all');
+}
+
+// Analytics (Admin only)
+export async function getAnalyticsSummary(days?: number): Promise<AnalyticsSummaryResponse> {
+  const params = new URLSearchParams();
+  if (days) params.set('days', String(days));
+  return request<AnalyticsSummaryResponse>(`/analytics/summary?${params}`);
+}
+
+export async function getAnalyticsTimeSeries(
+  eventTypes: AnalyticsEventType[],
+  days?: number
+): Promise<TimeSeriesResponse> {
+  const params = new URLSearchParams();
+  if (days) params.set('days', String(days));
+  if (eventTypes.length) params.set('eventTypes', eventTypes.join(','));
+  return request<TimeSeriesResponse>(`/analytics/timeseries?${params}`);
+}
+
+export async function getFeatureAdoption(days?: number): Promise<FeatureAdoptionResponse> {
+  const params = new URLSearchParams();
+  if (days) params.set('days', String(days));
+  return request<FeatureAdoptionResponse>(`/analytics/feature-adoption?${params}`);
+}
+
+export async function getPerformanceMetrics(days?: number): Promise<PerformanceMetricsResponse> {
+  const params = new URLSearchParams();
+  if (days) params.set('days', String(days));
+  return request<PerformanceMetricsResponse>(`/analytics/performance?${params}`);
+}
+
+export async function getTopRepos(days?: number): Promise<TopReposResponse> {
+  const params = new URLSearchParams();
+  if (days) params.set('days', String(days));
+  return request<TopReposResponse>(`/analytics/top-repos?${params}`);
+}
+
+export async function getAnalyticsErrors(days?: number): Promise<ErrorsResponse> {
+  const params = new URLSearchParams();
+  if (days) params.set('days', String(days));
+  return request<ErrorsResponse>(`/analytics/errors?${params}`);
+}
+
+export async function getAnalyticsEvents(
+  options?: { days?: number; eventType?: string; limit?: number }
+): Promise<EventsResponse> {
+  const params = new URLSearchParams();
+  if (options?.days) params.set('days', String(options.days));
+  if (options?.eventType) params.set('eventType', options.eventType);
+  if (options?.limit) params.set('limit', String(options.limit));
+  return request<EventsResponse>(`/analytics/events?${params}`);
+}
+
+export async function checkAnalyticsAccess(): Promise<{ isAdmin: boolean; email: string }> {
+  return request<{ isAdmin: boolean; email: string }>('/analytics/me');
+}
+
+// User-level analytics
+export async function getUsersActivity(days?: number): Promise<UsersResponse> {
+  const params = new URLSearchParams();
+  if (days) params.set('days', String(days));
+  return request<UsersResponse>(`/analytics/users?${params}`);
+}
+
+export async function getUserDetail(userEmail: string, days?: number): Promise<UserDetail> {
+  const params = new URLSearchParams();
+  if (days) params.set('days', String(days));
+  return request<UserDetail>(`/analytics/users/${encodeURIComponent(userEmail)}?${params}`);
 }
 
 export { ApiError };

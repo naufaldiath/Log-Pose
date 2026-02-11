@@ -11,6 +11,11 @@ export const configSchema = z.object({
   
   // Allowlisted emails (comma-separated)
   ALLOWLIST_EMAILS: z.string().transform(s => s.split(',').map(e => e.trim().toLowerCase()).filter(Boolean)),
+
+  // Admin emails (comma-separated, defaults to ALLOWLIST_EMAILS if not set)
+  ADMIN_EMAILS: z.string().optional().transform(s =>
+    s ? s.split(',').map(e => e.trim().toLowerCase()).filter(Boolean) : undefined
+  ),
   
   // Cloudflare Access settings
   CF_ACCESS_TEAM_DOMAIN: z.string().optional(),

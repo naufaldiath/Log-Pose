@@ -11,6 +11,8 @@ import { authMiddleware } from './middleware/auth.js';
 import { apiRoutes } from './routes/api.js';
 import { wsRoutes } from './routes/ws.js';
 import { auditLogger } from './services/audit-logger.js';
+import { analyticsLogger } from './services/analytics-logger.js';
+import { analyticsRoutes } from './routes/analytics.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -49,6 +51,9 @@ async function main() {
 
     console.log('✅ Production configuration validated');
   }
+
+  // Cleanup old analytics logs on startup
+  analyticsLogger.cleanupOldLogs();
 
   // Create Fastify instance
   const fastify = Fastify({
@@ -98,6 +103,9 @@ async function main() {
   // Register WebSocket routes
   await fastify.register(wsRoutes);
 
+  // Register analytics routes
+  await fastify.register(analyticsRoutes);
+
   // Serve static files (in both development and production for testing)
   // Note: In development, the client usually runs separately on Vite dev server
   // But we enable this for local testing of the production build
@@ -136,6 +144,7 @@ async function main() {
     console.log(`\n${signal} received, shutting down...`);
 
     auditLogger.close();
+    analyticsLogger.close();
 
     await fastify.close();
     process.exit(0);

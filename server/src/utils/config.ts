@@ -31,6 +31,7 @@ export function logConfig(): void {
   console.log(`  NODE_ENV: ${config.NODE_ENV}`);
   console.log(`  REPO_ROOTS: ${config.REPO_ROOTS.join(', ')}`);
   console.log(`  ALLOWLIST_EMAILS: ${config.ALLOWLIST_EMAILS.length} emails configured`);
+  console.log(`  ADMIN_EMAILS: ${config.ADMIN_EMAILS?.length ?? config.ALLOWLIST_EMAILS.length} emails configured`);
   console.log(`  MAX_SESSIONS_PER_USER: ${config.MAX_SESSIONS_PER_USER}`);
   console.log(`  MAX_TOTAL_SESSIONS: ${config.MAX_TOTAL_SESSIONS}`);
   console.log(`  DISCONNECTED_TTL_MINUTES: ${config.DISCONNECTED_TTL_MINUTES}`);

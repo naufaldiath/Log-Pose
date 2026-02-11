@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { sessionManager } from '../services/claude-session.js';
 import { resolveRepoId } from '../services/repo.js';
 import { auditLogger } from '../services/audit-logger.js';
+import { analyticsLogger } from '../services/analytics-logger.js';
 import { config } from '../utils/config.js';
 import type { ClientMessage, ServerMessage, AuthenticatedUser } from '../types/index.js';
 
@@ -64,6 +65,7 @@ export const wsRoutes: FastifyPluginAsync = async (fastify) => {
 
     // Generate client ID
     const clientId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const wsStartTime = Date.now();
 
     // Logging
     auditLogger.logWsConnect(user.email, repoId, clientId);
@@ -147,6 +149,8 @@ export const wsRoutes: FastifyPluginAsync = async (fastify) => {
                   });
                 }
 
+                const connectTimeMs = Date.now() - wsStartTime;
+                analyticsLogger.logTerminalConnected(user.email, repoId, connectTimeMs);
                 auditLogger.logClaudeSessionStart(user.email, repoId, session.id);
               } else {
                 sendMessage(socket, { type: 'error', message: 'Failed to attach to session' });
@@ -227,6 +231,9 @@ export const wsRoutes: FastifyPluginAsync = async (fastify) => {
     socket.on('close', () => {
       clearInterval(pingInterval);
 
+      const durationMs = Date.now() - wsStartTime;
+      analyticsLogger.logTerminalDisconnected(user.email, repoId, durationMs);
+
       if (currentSessionId) {
         sessionManager.detachClient(currentSessionId, clientId);
       }
@@ -237,6 +244,7 @@ export const wsRoutes: FastifyPluginAsync = async (fastify) => {
     // Handle error
     socket.on('error', (error) => {
       console.error(`WebSocket error: ${user.email} -> ${repoId}:`, error);
+      analyticsLogger.logWebSocketError(user.email, repoId, error.message || 'unknown');
     });
   });
 
