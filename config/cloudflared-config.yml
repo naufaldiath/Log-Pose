@@ -1,0 +1,17 @@
+# Cloudflare Tunnel Configuration
+# Save this as ~/.cloudflared/config.yml on the Mac mini
+
+tunnel: YOUR_TUNNEL_ID
+credentials-file: /Users/remote-dev/.cloudflared/YOUR_TUNNEL_ID.json
+
+ingress:
+  # Route all traffic to the local server
+  - hostname: logpose.your-domain.com
+    service: http://127.0.0.1:3000
+    originRequest:
+      # Enable WebSocket support
+      noTLSVerify: false
+      connectTimeout: 30s
+      
+  # Catch-all rule (required)
+  - service: http_status:404

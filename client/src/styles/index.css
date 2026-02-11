@@ -1,0 +1,424 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Midnight Brass Theme - Global Styles */
+:root {
+  --color-bg: #18181b;
+  --color-surface: #27272a;
+  --color-border: #3f3f46;
+  --color-text: #f4f4f5;
+  --color-text-muted: #a1a1aa;
+  --color-accent: #d6952f;
+  --color-accent-hover: #e0ad4d;
+  --color-selection: #134e4a;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}
+
+/* Terminal styling - no padding to prevent fit calculation issues */
+.xterm {
+  padding: 0;
+}
+
+.xterm-viewport::-webkit-scrollbar {
+  width: 8px;
+}
+
+.xterm-viewport::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.xterm-viewport::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 4px;
+}
+
+/* Editor overrides */
+.monaco-editor {
+  --vscode-editor-background: #1e1e22 !important;
+}
+
+/* Panel borders - "instrument panel" style */
+.panel-border {
+  border: 2px solid var(--color-border);
+}
+
+.panel-border-thick {
+  border: 3px solid var(--color-border);
+}
+
+/* Focus states with brass accent */
+.focus-brass:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+
+/* Button base styles */
+.btn {
+  @apply px-3 py-1.5 rounded font-medium transition-colors duration-150;
+}
+
+.btn-primary {
+  @apply bg-brass-600 hover:bg-brass-500 text-white;
+}
+
+.btn-secondary {
+  @apply bg-midnight-800 hover:bg-midnight-700 text-midnight-100 border border-midnight-600;
+}
+
+.btn-ghost {
+  @apply bg-transparent hover:bg-midnight-800 text-midnight-300 hover:text-midnight-100;
+}
+
+/* Mobile key bar */
+.keybar {
+  @apply bg-midnight-900 border-t border-midnight-700;
+  /* Fixed height container */
+  height: auto;
+  min-height: 52px;
+  /* Ensure it stays at bottom and doesn't shrink */
+  flex-shrink: 0;
+  /* Make sure it's visible */
+  position: relative;
+  z-index: 10;
+}
+
+.keybar-scroll {
+  @apply flex items-center gap-1 p-2;
+  /* Enable horizontal scrolling */
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  scrollbar-width: none; /* Hide scrollbar on Firefox */
+  -ms-overflow-style: none; /* Hide scrollbar on IE/Edge */
+  /* Prevent content from wrapping */
+  white-space: nowrap;
+  flex-wrap: nowrap;
+}
+
+/* Hide scrollbar on WebKit browsers */
+.keybar-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.keybar-btn {
+  @apply px-3 py-2 text-sm font-mono bg-midnight-800 hover:bg-midnight-700
+         text-midnight-200 rounded border border-midnight-600
+         active:bg-brass-700 active:border-brass-600 transition-colors;
+  min-width: 44px;
+  min-height: 44px;
+  /* Prevent buttons from shrinking */
+  flex-shrink: 0;
+  /* Center content */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.keybar-btn.active {
+  @apply bg-brass-700 border-brass-600 text-white;
+}
+
+.keybar-divider {
+  @apply w-px h-8 bg-midnight-600 mx-1;
+  flex-shrink: 0;
+}
+
+/* File tree */
+.file-tree-item {
+  @apply flex items-center gap-2 px-2 py-1 rounded cursor-pointer
+         hover:bg-midnight-800 text-midnight-300 hover:text-midnight-100
+         transition-colors;
+}
+
+.file-tree-item.selected {
+  @apply bg-teal-900/40 text-teal-300;
+}
+
+/* Tab bar */
+.tab {
+  @apply px-4 py-2 text-sm font-medium text-midnight-400 
+         border-b-2 border-transparent hover:text-midnight-200
+         transition-colors cursor-pointer;
+}
+
+.tab.active {
+  @apply text-brass-400 border-brass-500;
+}
+
+/* Status indicators */
+.status-dot {
+  @apply w-2 h-2 rounded-full;
+}
+
+.status-dot.running {
+  @apply bg-green-500 animate-pulse;
+}
+
+.status-dot.starting {
+  @apply bg-yellow-500 animate-pulse;
+}
+
+.status-dot.exited {
+  @apply bg-red-500;
+}
+
+/* Slide-in drawer for mobile */
+.drawer {
+  @apply fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-midnight-900 
+         border-r border-midnight-700 transform transition-transform duration-300 z-50;
+}
+
+.drawer.closed {
+  @apply -translate-x-full;
+}
+
+.drawer-overlay {
+  @apply fixed inset-0 bg-black/50 z-40 transition-opacity;
+}
+
+/* Terminal Component Styles */
+.claude-terminal {
+  @apply flex flex-col h-full bg-midnight-950;
+  /* Ensure proper flex behavior on mobile */
+  min-height: 0;
+}
+
+.terminal-header {
+  @apply flex items-center justify-between px-2 sm:px-3 py-2 bg-midnight-900 border-b border-midnight-700 gap-2;
+  min-height: 44px;
+}
+
+.terminal-title {
+  @apply flex items-center gap-1.5 sm:gap-2 text-sm font-medium text-midnight-200 min-w-0 flex-shrink;
+}
+
+.terminal-title > span:not(.terminal-icon):not(.repo-badge) {
+  @apply hidden sm:inline;
+}
+
+.terminal-icon {
+  @apply text-lg flex-shrink-0;
+}
+
+.repo-badge {
+  @apply px-1.5 sm:px-2 py-0.5 text-xs font-mono bg-midnight-800 text-brass-400 rounded border border-midnight-600 truncate max-w-[80px] sm:max-w-[120px];
+}
+
+.terminal-controls {
+  @apply flex items-center gap-2 sm:gap-3 flex-shrink-0;
+}
+
+.terminal-btn {
+  @apply px-2 sm:px-3 py-1 text-xs font-medium rounded transition-colors duration-150 whitespace-nowrap;
+}
+
+.terminal-btn.connect {
+  @apply bg-green-700 hover:bg-green-600 text-white;
+}
+
+.terminal-btn.disconnect {
+  @apply bg-red-700 hover:bg-red-600 text-white;
+}
+
+.terminal-btn:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.status-indicator {
+  @apply text-xs font-medium whitespace-nowrap;
+}
+
+.status-indicator.connected {
+  @apply text-green-400;
+}
+
+.status-indicator.connecting {
+  @apply text-yellow-400;
+}
+
+.status-indicator.disconnected {
+  @apply text-red-400;
+}
+
+/* Hide status text on very narrow screens, show only dot */
+@media (max-width: 400px) {
+  .status-indicator {
+    @apply text-transparent w-2 h-2 rounded-full p-0;
+  }
+  .status-indicator.connected {
+    @apply bg-green-500;
+  }
+  .status-indicator.connecting {
+    @apply bg-yellow-500;
+  }
+  .status-indicator.disconnected {
+    @apply bg-red-500;
+  }
+}
+
+.terminal-error {
+  @apply px-3 py-2 bg-red-950 border-b border-red-800 text-red-200 text-sm flex items-center gap-2;
+}
+
+/* Terminal container - xterm.js handles its own sizing */
+.terminal-container {
+  @apply flex-1 min-h-0 overflow-hidden relative;
+}
+
+/* Terminal Tabs */
+.terminal-tabs {
+  @apply flex items-center gap-1 px-2 py-1 bg-midnight-900 border-b border-midnight-700;
+  min-height: 36px;
+}
+
+.terminal-tabs-list {
+  @apply flex items-center gap-1 flex-1 overflow-x-auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.terminal-tabs-list::-webkit-scrollbar {
+  display: none;
+}
+
+.terminal-tab {
+  @apply flex items-center gap-2 px-3 py-1.5 text-sm rounded cursor-pointer
+         bg-midnight-800 text-midnight-300 hover:bg-midnight-700
+         transition-colors select-none;
+  min-width: 80px;
+  max-width: 160px;
+}
+
+.terminal-tab.active {
+  @apply bg-brass-700 text-white;
+}
+
+.terminal-tab-name {
+  @apply truncate flex-1;
+}
+
+.terminal-tab-actions {
+  @apply flex items-center gap-0.5 opacity-100 sm:opacity-0;
+}
+
+.terminal-tab:hover .terminal-tab-actions {
+  @apply opacity-100;
+}
+
+.terminal-tab-btn {
+  @apply p-1 rounded hover:bg-midnight-600 text-midnight-400 hover:text-midnight-200;
+}
+
+.terminal-tab.active .terminal-tab-btn {
+  @apply hover:bg-brass-600 text-brass-200 hover:text-white;
+}
+
+.terminal-tab-input {
+  @apply w-full bg-midnight-950 border border-brass-500 rounded px-2 py-0.5 text-sm text-midnight-100 outline-none;
+}
+
+.terminal-tab-new {
+  @apply p-1.5 rounded hover:bg-midnight-700 text-midnight-400 hover:text-midnight-200 transition-colors;
+}
+
+/* Resizable Panel Styles */
+.resizable-panel {
+  @apply relative flex;
+}
+
+.resizable-divider {
+  @apply absolute top-0 bottom-0 w-1 cursor-col-resize z-10 hover:bg-brass-500/30 transition-colors;
+}
+
+.resizable-divider:hover {
+  @apply bg-brass-500/50;
+}
+
+.resizable-divider.dragging {
+  @apply bg-brass-500/70;
+}
+
+/* Context Menu Styles */
+.context-menu {
+  @apply absolute z-50 min-w-[160px] bg-midnight-800 border border-midnight-600 rounded shadow-lg py-1;
+}
+
+.context-menu-item {
+  @apply w-full px-3 py-2 text-sm text-left text-midnight-200 hover:bg-midnight-700 transition-colors flex items-center gap-2;
+}
+
+.context-menu-item.danger {
+  @apply text-red-400 hover:bg-red-950/50;
+}
+
+.context-menu-separator {
+  @apply my-1 border-t border-midnight-600;
+}
+
+/* Inline Input for File Tree */
+.file-tree-input {
+  @apply flex-1 bg-midnight-800 border border-brass-500 rounded px-2 py-0.5 text-sm text-midnight-100 outline-none;
+}
+
+/* Mobile Tab Toggle */
+.mobile-tab-toggle {
+  @apply flex items-center gap-0.5 p-0.5 bg-midnight-800 rounded border border-midnight-600;
+}
+
+.mobile-tab-btn {
+  @apply px-2 sm:px-3 py-1.5 text-sm font-medium rounded transition-colors flex items-center;
+}
+
+.mobile-tab-btn.active {
+  @apply bg-brass-600 text-white;
+}
+
+.mobile-tab-btn:not(.active) {
+  @apply text-midnight-400 hover:text-midnight-200 hover:bg-midnight-700;
+}
+
+/* Extra small screen breakpoint */
+@media (max-width: 375px) {
+  .mobile-tab-btn {
+    @apply px-1.5 py-1;
+  }
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .show-mobile-only {
+    display: none !important;
+  }
+}

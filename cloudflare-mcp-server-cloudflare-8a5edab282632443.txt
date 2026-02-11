@@ -1,0 +1,4348 @@
+Directory structure:
+└── cloudflare-mcp-server-cloudflare/
+    ├── pnpm-workspace.yaml
+    ├── tsconfig.json
+    ├── turbo.json
+    ├── vitest.workspace.ts
+    ├── .dockerignore
+    ├── .editorconfig
+    ├── .eslintrc.cjs
+    ├── .npmrc
+    ├── .prettierignore
+    ├── apps/
+    │   ├── ai-gateway/
+    │   │   ├── package.json
+    │   │   ├── tsconfig.json
+    │   │   ├── types.d.ts
+    │   │   ├── vitest.config.ts
+    │   │   ├── .dev.vars.example
+    │   │   ├── .eslintrc.cjs
+    │   │   └── src/
+    │   │       ├── ai-gateway.context.ts
+    │   │       └── types.ts
+    │   ├── auditlogs/
+    │   │   ├── package.json
+    │   │   ├── tsconfig.json
+    │   │   ├── types.d.ts
+    │   │   ├── vitest.config.ts
+    │   │   ├── .dev.vars.example
+    │   │   ├── .eslintrc.cjs
+    │   │   └── src/
+    │   │       └── auditlogs.context.ts
+    │   ├── autorag/
+    │   │   ├── package.json
+    │   │   ├── tsconfig.json
+    │   │   ├── types.d.ts
+    │   │   ├── vitest.config.ts
+    │   │   ├── .dev.vars.example
+    │   │   ├── .eslintrc.cjs
+    │   │   └── src/
+    │   │       ├── autorag.context.ts
+    │   │       └── types.ts
+    │   ├── browser-rendering/
+    │   │   ├── package.json
+    │   │   ├── tsconfig.json
+    │   │   ├── types.d.ts
+    │   │   ├── vitest.config.ts
+    │   │   ├── .dev.vars.example
+    │   │   ├── .eslintrc.cjs
+    │   │   └── src/
+    │   │       └── browser.context.ts
+    │   ├── cloudflare-one-casb/
+    │   │   ├── README.md
+    │   │   ├── package.json
+    │   │   ├── tsconfig.json
+    │   │   ├── types.d.ts
+    │   │   ├── vitest.config.ts
+    │   │   ├── .dev.vars.example
+    │   │   ├── .eslintrc.cjs
+    │   │   └── src/
+    │   │       └── cf1-casb.context.ts
+    │   ├── demo-day/
+    │   │   ├── package.json
+    │   │   ├── tsconfig.json
+    │   │   └── .eslintrc.cjs
+    │   ├── dex-analysis/
+    │   │   ├── package.json
+    │   │   ├── tsconfig.json
+    │   │   ├── types.d.ts
+    │   │   ├── vitest.config.ts
+    │   │   ├── .dev.vars.example
+    │   │   ├── .eslintrc.cjs
+    │   │   └── src/
+    │   │       └── dex-analysis.context.ts
+    │   ├── dns-analytics/
+    │   │   ├── package.json
+    │   │   ├── tsconfig.json
+    │   │   ├── types.d.ts
+    │   │   ├── vitest.config.ts
+    │   │   ├── .dev.vars.example
+    │   │   ├── .eslintrc.cjs
+    │   │   └── src/
+    │   │       └── dns-analytics.context.ts
+    │   ├── docs-ai-search/
+    │   │   ├── package.json
+    │   │   ├── tsconfig.json
+    │   │   ├── vitest.config.ts
+    │   │   ├── .eslintrc.cjs
+    │   │   └── src/
+    │   │       └── docs-ai-search.context.ts
+    │   ├── docs-autorag/
+    │   │   ├── README.md
+    │   │   ├── package.json
+    │   │   ├── tsconfig.json
+    │   │   ├── vitest.config.ts
+    │   │   ├── .eslintrc.cjs
+    │   │   └── src/
+    │   │       ├── docs-autorag.app.ts
+    │   │       └── docs-autorag.context.ts
+    │   ├── docs-vectorize/
+    │   │   ├── package.json
+    │   │   ├── tsconfig.json
+    │   │   ├── vitest.config.ts
+    │   │   ├── .eslintrc.cjs
+    │   │   └── src/
+    │   │       └── docs-vectorize.context.ts
+    │   ├── graphql/
+    │   │   ├── package.json
+    │   │   ├── tsconfig.json
+    │   │   ├── types.d.ts
+    │   │   ├── .eslintrc.cjs
+    │   │   └── src/
+    │   │       └── graphql.context.ts
+    │   ├── logpush/
+    │   │   ├── package.json
+    │   │   ├── tsconfig.json
+    │   │   ├── types.d.ts
+    │   │   ├── vitest.config.ts
+    │   │   ├── .dev.vars.example
+    │   │   ├── .eslintrc.cjs
+    │   │   └── src/
+    │   │       └── logpush.context.ts
+    │   ├── radar/
+    │   │   ├── package.json
+    │   │   ├── tsconfig.json
+    │   │   ├── types.d.ts
+    │   │   ├── vitest.config.ts
+    │   │   ├── .dev.vars.example
+    │   │   ├── .eslintrc.cjs
+    │   │   └── src/
+    │   │       └── utils.ts
+    │   ├── sandbox-container/
+    │   │   ├── tsconfig.json
+    │   │   ├── types.d.ts
+    │   │   ├── vitest.config.evals.ts
+    │   │   ├── .dev.vars.example
+    │   │   ├── .eslintrc.cjs
+    │   │   ├── container/
+    │   │   │   └── tsconfig.json
+    │   │   ├── evals/
+    │   │   │   ├── initialize.eval.ts
+    │   │   │   └── utils.ts
+    │   │   ├── server/
+    │   │   │   ├── metrics.ts
+    │   │   │   ├── sandbox.server.context.ts
+    │   │   │   ├── utils.spec.ts
+    │   │   │   └── utils.ts
+    │   │   └── shared/
+    │   │       ├── consts.ts
+    │   │       └── schema.ts
+    │   ├── workers-bindings/
+    │   │   ├── tsconfig.json
+    │   │   ├── vitest.config.evals.ts
+    │   │   ├── vitest.config.ts
+    │   │   ├── .dev.vars.example
+    │   │   ├── .eslintrc.cjs
+    │   │   ├── evals/
+    │   │   │   ├── types.d.ts
+    │   │   │   └── utils.ts
+    │   │   └── src/
+    │   │       └── bindings.context.ts
+    │   ├── workers-builds/
+    │   │   ├── package.json
+    │   │   ├── tsconfig.json
+    │   │   ├── types.d.ts
+    │   │   ├── vite.config.mts
+    │   │   ├── vitest.config.ts
+    │   │   ├── .dev.vars.example
+    │   │   ├── .eslintrc.cjs
+    │   │   └── src/
+    │   │       └── workers-builds.context.ts
+    │   └── workers-observability/
+    │       ├── package.json
+    │       ├── tsconfig.json
+    │       ├── types.d.ts
+    │       ├── vitest.config.ts
+    │       ├── .dev.vars.example
+    │       ├── .eslintrc.cjs
+    │       └── src/
+    │           └── workers-observability.context.ts
+    ├── packages/
+    │   ├── eslint-config/
+    │   │   ├── README.md
+    │   │   ├── CHANGELOG.md
+    │   │   └── package.json
+    │   ├── eval-tools/
+    │   │   ├── CHANGELOG.md
+    │   │   ├── package.json
+    │   │   ├── tsconfig.json
+    │   │   └── wrangler.json
+    │   ├── mcp-common/
+    │   │   ├── README.md
+    │   │   ├── package.json
+    │   │   ├── tsconfig.json
+    │   │   ├── types.d.ts
+    │   │   ├── vitest.config.ts
+    │   │   ├── .eslintrc.cjs
+    │   │   ├── src/
+    │   │   │   ├── api-handler.ts
+    │   │   │   ├── config.ts
+    │   │   │   ├── constants.ts
+    │   │   │   ├── env.ts
+    │   │   │   ├── format.ts
+    │   │   │   ├── get-props.ts
+    │   │   │   ├── mcp-error.ts
+    │   │   │   ├── poll.ts
+    │   │   │   ├── scopes.ts
+    │   │   │   ├── prompts/
+    │   │   │   │   ├── docs-ai-search.prompts.ts
+    │   │   │   │   └── docs-vectorize.prompts.ts
+    │   │   │   └── types/
+    │   │   │       ├── cloudflare-mcp-agent.types.ts
+    │   │   │       ├── d1.types.ts
+    │   │   │       ├── shared.types.ts
+    │   │   │       ├── tools.types.ts
+    │   │   │       └── workers.types.ts
+    │   │   └── tests/
+    │   │       └── utils/
+    │   │           └── cloudflare-mock.ts
+    │   ├── mcp-observability/
+    │   │   ├── CHANGELOG.md
+    │   │   ├── package.json
+    │   │   ├── tsconfig.json
+    │   │   └── src/
+    │   │       └── index.ts
+    │   ├── tools/
+    │   │   ├── CHANGELOG.md
+    │   │   ├── package.json
+    │   │   ├── tsconfig.json
+    │   │   ├── vitest.config.ts
+    │   │   ├── .eslintrc.cjs
+    │   │   └── src/
+    │   │       ├── proc.ts
+    │   │       ├── cmd/
+    │   │       │   └── deploy-published-packages.ts
+    │   │       └── test/
+    │   │           ├── setup.ts
+    │   │           └── fixtures/
+    │   │               └── changesets/
+    │   │                   ├── empty/
+    │   │                   │   └── .gitkeep
+    │   │                   ├── invalid-json/
+    │   │                   │   └── published-packages.json
+    │   │                   ├── invalid-schema/
+    │   │                   │   └── published-packages.json
+    │   │                   └── valid/
+    │   │                       └── published-packages.json
+    │   └── typescript-config/
+    │       ├── CHANGELOG.md
+    │       ├── package.json
+    │       ├── tools.json
+    │       ├── workers-lib.json
+    │       └── workers.json
+    ├── .changeset/
+    │   ├── README.md
+    │   └── config.json
+    └── .github/
+        ├── actions/
+        │   └── setup/
+        │       └── action.yml
+        ├── ISSUE_TEMPLATE/
+        │   └── bug_report.md
+        └── workflows/
+            ├── branches.yml
+            └── main.yml
+
+================================================
+FILE: pnpm-workspace.yaml
+================================================
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+
+
+================================================
+FILE: tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/tools.json"
+}
+
+
+
+================================================
+FILE: turbo.json
+================================================
+{
+	"$schema": "https://turbo.build/schema.json",
+	"globalPassThroughEnv": ["FORCE_COLOR", "RUNNER_TEMP"],
+	"tasks": {
+		"deploy": {
+			"cache": false,
+			"env": ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN", "CLOUDFLARE_STAGING_API_TOKEN"],
+			"outputs": ["dist"],
+			"outputLogs": "new-only"
+		},
+		"check": {
+			"dependsOn": ["^check:types", "^check:lint", "check:types", "check:lint"],
+			"outputLogs": "new-only"
+		},
+		"check:types": {
+			"dependsOn": ["^check:types"],
+			"outputLogs": "new-only"
+		},
+		"check:lint": {
+			"env": ["GITHUB_ACTIONS"],
+			"dependsOn": ["^check:lint"],
+			"outputLogs": "new-only"
+		},
+		"eval:ci": {
+			"dependsOn": ["^eval:ci"],
+			"outputLogs": "new-only"
+		},
+		"types": {
+			"dependsOn": ["^types"],
+			"outputLogs": "new-only"
+		},
+		"//#check:format": {
+			"outputLogs": "new-only"
+		},
+		"//#check:deps": {
+			"outputLogs": "new-only"
+		}
+	}
+}
+
+
+
+================================================
+FILE: vitest.workspace.ts
+================================================
+import { defineWorkspace } from 'vitest/config'
+
+export default defineWorkspace([
+	'apps/*/vitest.config.ts',
+	'apps/*/vitest.config.node.ts',
+	'packages/*/vitest.config.ts',
+	'packages/*/vitest.config.node.ts',
+])
+
+
+
+================================================
+FILE: .dockerignore
+================================================
+**/node_modules/
+**/.gitignore
+**/README.md
+**/.vscode/
+**/Dockerfile
+**/out/
+
+
+================================================
+FILE: .editorconfig
+================================================
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+[*]
+indent_style = tab
+indent_size = 2
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.{yml,yaml,mdx}]
+indent_style = space
+
+
+
+================================================
+FILE: .eslintrc.cjs
+================================================
+// This configuration only applies to the package manager root.
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+	ignorePatterns: ['apps/**', 'packages/**'],
+	extends: ['@repo/eslint-config/default.cjs'],
+}
+
+
+
+================================================
+FILE: .npmrc
+================================================
+auto-install-peers=true
+public-hoist-pattern[]=*eslint*
+public-hoist-pattern[]=*prettier*
+
+
+
+================================================
+FILE: .prettierignore
+================================================
+.changeset
+.github/
+pnpm-lock.yaml
+vitest.config.ts.timestamp*
+vite.config.ts.timestamp*
+worker-configuration.d.ts
+**/dist/**
+packages/tools/src/test/fixtures/changesets/invalid-json/*.json
+
+
+
+================================================
+FILE: apps/ai-gateway/package.json
+================================================
+{
+	"name": "cloudflare-ai-gateway-mcp-server",
+	"version": "0.1.9",
+	"private": true,
+	"scripts": {
+		"check:lint": "run-eslint-workers",
+		"check:types": "run-tsc",
+		"deploy": "run-wrangler-deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"types": "wrangler types --include-env=false",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@cloudflare/workers-oauth-provider": "0.0.13",
+		"@hono/zod-validator": "0.4.3",
+		"@modelcontextprotocol/sdk": "1.20.2",
+		"@repo/mcp-common": "workspace:*",
+		"@repo/mcp-observability": "workspace:*",
+		"agents": "0.2.19",
+		"cloudflare": "4.2.0",
+		"hono": "4.7.6",
+		"zod": "3.24.2"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "0.8.14",
+		"@types/node": "22.14.1",
+		"prettier": "3.5.3",
+		"typescript": "5.5.4",
+		"vitest": "3.0.9",
+		"wrangler": "4.10.0"
+	}
+}
+
+
+
+================================================
+FILE: apps/ai-gateway/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/workers.json",
+	"include": ["*/**.ts", "./vitest.config.ts", "./types.d.ts"]
+}
+
+
+
+================================================
+FILE: apps/ai-gateway/types.d.ts
+================================================
+import type { TestEnv } from './vitest.config'
+
+declare module 'cloudflare:test' {
+	interface ProvidedEnv extends TestEnv {}
+}
+
+
+
+================================================
+FILE: apps/ai-gateway/vitest.config.ts
+================================================
+import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
+
+import type { Env } from './src/ai-gateway.context'
+
+export interface TestEnv extends Env {
+	CLOUDFLARE_MOCK_ACCOUNT_ID: string
+	CLOUDFLARE_MOCK_API_TOKEN: string
+}
+
+export default defineWorkersConfig({
+	test: {
+		poolOptions: {
+			workers: {
+				wrangler: { configPath: `${__dirname}/wrangler.jsonc` },
+				miniflare: {
+					bindings: {
+						CLOUDFLARE_MOCK_ACCOUNT_ID: 'mock-account-id',
+						CLOUDFLARE_MOCK_API_TOKEN: 'mock-api-token',
+					} satisfies Partial<TestEnv>,
+				},
+			},
+		},
+	},
+})
+
+
+
+================================================
+FILE: apps/ai-gateway/.dev.vars.example
+================================================
+CLOUDFLARE_CLIENT_ID=
+CLOUDFLARE_CLIENT_SECRET=
+DEV_DISABLE_OAUTH=
+DEV_CLOUDFLARE_API_TOKEN=
+
+
+
+
+================================================
+FILE: apps/ai-gateway/.eslintrc.cjs
+================================================
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+	root: true,
+	extends: ['@repo/eslint-config/default.cjs'],
+}
+
+
+
+================================================
+FILE: apps/ai-gateway/src/ai-gateway.context.ts
+================================================
+import type { UserDetails } from '@repo/mcp-common/src/durable-objects/user_details.do'
+import type { AIGatewayMCP } from './ai-gateway.app'
+
+export interface Env {
+	OAUTH_KV: KVNamespace
+	MCP_COOKIE_ENCRYPTION_KEY: string
+	ENVIRONMENT: 'development' | 'staging' | 'production'
+	MCP_SERVER_NAME: string
+	MCP_SERVER_VERSION: string
+	CLOUDFLARE_CLIENT_ID: string
+	CLOUDFLARE_CLIENT_SECRET: string
+	MCP_OBJECT: DurableObjectNamespace<AIGatewayMCP>
+	USER_DETAILS: DurableObjectNamespace<UserDetails>
+	MCP_METRICS: AnalyticsEngineDataset
+	DEV_DISABLE_OAUTH: string
+	DEV_CLOUDFLARE_API_TOKEN: string
+	DEV_CLOUDFLARE_EMAIL: string
+}
+
+
+
+================================================
+FILE: apps/ai-gateway/src/types.ts
+================================================
+import { z } from 'zod'
+
+export const GatewayIdParam = z.string().describe('The gateway ID.')
+export const LogIdParam = z.string()
+export const pageParam = z.number().int().min(1).optional().default(1)
+export const perPageParam = z.number().int().min(1).max(50).optional().default(20)
+
+export const ListLogsParams = {
+	gateway_id: GatewayIdParam,
+	page: pageParam,
+	per_page: perPageParam,
+	order_by: z
+		.enum([
+			'created_at',
+			'provider',
+			'model',
+			'model_type',
+			'success',
+			'cached',
+			'cost',
+			'tokens_in',
+			'tokens_out',
+			'duration',
+			'feedback',
+		])
+		.optional()
+		.default('created_at'),
+	order_by_direction: z.enum(['asc', 'desc']).optional().default('desc'),
+	start_date: z.string().datetime().optional(),
+	end_date: z.string().datetime().optional(),
+	feedback: z.union([z.literal(-1), z.literal(0), z.literal(1)]).optional(),
+	success: z.boolean().optional(),
+	cached: z.boolean().optional(),
+	model: z.string().toLowerCase().optional(),
+	provider: z.string().toLowerCase().optional(),
+}
+
+
+
+================================================
+FILE: apps/auditlogs/package.json
+================================================
+{
+	"name": "auditlogs",
+	"version": "0.1.10",
+	"private": true,
+	"scripts": {
+		"check:lint": "run-eslint-workers",
+		"check:types": "run-tsc",
+		"deploy": "run-wrangler-deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"types": "wrangler types --include-env=false",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@cloudflare/workers-oauth-provider": "0.0.13",
+		"@hono/zod-validator": "0.4.3",
+		"@modelcontextprotocol/sdk": "1.20.2",
+		"@repo/mcp-common": "workspace:*",
+		"@repo/mcp-observability": "workspace:*",
+		"agents": "0.2.19",
+		"cloudflare": "4.2.0",
+		"hono": "4.7.6",
+		"zod": "3.24.2"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "0.8.14",
+		"@types/node": "22.14.1",
+		"prettier": "3.5.3",
+		"typescript": "5.5.4",
+		"vitest": "3.0.9",
+		"wrangler": "4.10.0"
+	}
+}
+
+
+
+================================================
+FILE: apps/auditlogs/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/workers.json",
+	"include": ["*/**.ts", "worker-configuration.d.ts", "./vitest.config.ts", "./types.d.ts"]
+}
+
+
+
+================================================
+FILE: apps/auditlogs/types.d.ts
+================================================
+import type { TestEnv } from './vitest.config'
+
+declare module 'cloudflare:test' {
+	interface ProvidedEnv extends TestEnv {}
+}
+
+
+
+================================================
+FILE: apps/auditlogs/vitest.config.ts
+================================================
+import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
+
+import type { Env } from './src/auditlogs.context'
+
+export interface TestEnv extends Env {
+	CLOUDFLARE_MOCK_ACCOUNT_ID: string
+	CLOUDFLARE_MOCK_API_TOKEN: string
+}
+
+export default defineWorkersConfig({
+	test: {
+		poolOptions: {
+			workers: {
+				wrangler: { configPath: `${__dirname}/wrangler.jsonc` },
+				miniflare: {
+					bindings: {
+						CLOUDFLARE_MOCK_ACCOUNT_ID: 'mock-account-id',
+						CLOUDFLARE_MOCK_API_TOKEN: 'mock-api-token',
+					} satisfies Partial<TestEnv>,
+				},
+			},
+		},
+	},
+})
+
+
+
+================================================
+FILE: apps/auditlogs/.dev.vars.example
+================================================
+CLOUDFLARE_CLIENT_ID=
+CLOUDFLARE_CLIENT_SECRET=
+DEV_DISABLE_OAUTH=
+DEV_CLOUDFLARE_API_TOKEN=
+
+
+
+================================================
+FILE: apps/auditlogs/.eslintrc.cjs
+================================================
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+	root: true,
+	extends: ['@repo/eslint-config/default.cjs'],
+}
+
+
+
+================================================
+FILE: apps/auditlogs/src/auditlogs.context.ts
+================================================
+import type { UserDetails } from '@repo/mcp-common/src/durable-objects/user_details.do'
+import type { AuditlogMCP } from './auditlogs.app'
+
+export interface Env {
+	OAUTH_KV: KVNamespace
+	MCP_COOKIE_ENCRYPTION_KEY: string
+	ENVIRONMENT: 'development' | 'staging' | 'production'
+	MCP_SERVER_NAME: string
+	MCP_SERVER_VERSION: string
+	CLOUDFLARE_ACCESS_TOKEN: string
+	CLOUDFLARE_CLIENT_ID: string
+	CLOUDFLARE_CLIENT_SECRET: string
+	MCP_OBJECT: DurableObjectNamespace<AuditlogMCP>
+	USER_DETAILS: DurableObjectNamespace<UserDetails>
+	MCP_METRICS: AnalyticsEngineDataset
+	DEV_DISABLE_OAUTH: string
+	DEV_CLOUDFLARE_API_TOKEN: string
+	DEV_CLOUDFLARE_EMAIL: string
+}
+
+
+
+================================================
+FILE: apps/autorag/package.json
+================================================
+{
+	"name": "cloudflare-autorag-mcp-server",
+	"version": "0.1.9",
+	"private": true,
+	"scripts": {
+		"check:lint": "run-eslint-workers",
+		"check:types": "run-tsc",
+		"deploy": "run-wrangler-deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"types": "wrangler types --include-env=false",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@cloudflare/workers-oauth-provider": "0.0.13",
+		"@hono/zod-validator": "0.4.3",
+		"@modelcontextprotocol/sdk": "1.20.2",
+		"@repo/mcp-common": "workspace:*",
+		"@repo/mcp-observability": "workspace:*",
+		"agents": "0.2.19",
+		"cloudflare": "4.2.0",
+		"hono": "4.7.6",
+		"zod": "3.24.2"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "0.8.14",
+		"@types/node": "22.14.1",
+		"prettier": "3.5.3",
+		"typescript": "5.5.4",
+		"vitest": "3.0.9",
+		"wrangler": "4.10.0"
+	}
+}
+
+
+
+================================================
+FILE: apps/autorag/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/workers.json",
+	"include": ["*/**.ts", "./vitest.config.ts", "./types.d.ts"]
+}
+
+
+
+================================================
+FILE: apps/autorag/types.d.ts
+================================================
+import type { TestEnv } from './vitest.config'
+
+declare module 'cloudflare:test' {
+	interface ProvidedEnv extends TestEnv {}
+}
+
+
+
+================================================
+FILE: apps/autorag/vitest.config.ts
+================================================
+import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
+
+import type { Env } from './src/autorag.context'
+
+export interface TestEnv extends Env {
+	CLOUDFLARE_MOCK_ACCOUNT_ID: string
+	CLOUDFLARE_MOCK_API_TOKEN: string
+}
+
+export default defineWorkersConfig({
+	test: {
+		poolOptions: {
+			workers: {
+				wrangler: { configPath: `${__dirname}/wrangler.jsonc` },
+				miniflare: {
+					bindings: {
+						CLOUDFLARE_MOCK_ACCOUNT_ID: 'mock-account-id',
+						CLOUDFLARE_MOCK_API_TOKEN: 'mock-api-token',
+					} satisfies Partial<TestEnv>,
+				},
+			},
+		},
+	},
+})
+
+
+
+================================================
+FILE: apps/autorag/.dev.vars.example
+================================================
+CLOUDFLARE_CLIENT_ID=
+CLOUDFLARE_CLIENT_SECRET=
+DEV_DISABLE_OAUTH=
+DEV_CLOUDFLARE_API_TOKEN=
+
+
+
+
+================================================
+FILE: apps/autorag/.eslintrc.cjs
+================================================
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+	root: true,
+	extends: ['@repo/eslint-config/default.cjs'],
+}
+
+
+
+================================================
+FILE: apps/autorag/src/autorag.context.ts
+================================================
+import type { UserDetails } from '@repo/mcp-common/src/durable-objects/user_details.do'
+import type { AutoRAGMCP } from './autorag.app'
+
+export interface Env {
+	OAUTH_KV: KVNamespace
+	MCP_COOKIE_ENCRYPTION_KEY: string
+	ENVIRONMENT: 'development' | 'staging' | 'production'
+	MCP_SERVER_NAME: string
+	MCP_SERVER_VERSION: string
+	CLOUDFLARE_CLIENT_ID: string
+	CLOUDFLARE_CLIENT_SECRET: string
+	MCP_OBJECT: DurableObjectNamespace<AutoRAGMCP>
+	USER_DETAILS: DurableObjectNamespace<UserDetails>
+	MCP_METRICS: AnalyticsEngineDataset
+	DEV_DISABLE_OAUTH: string
+	DEV_CLOUDFLARE_API_TOKEN: string
+	DEV_CLOUDFLARE_EMAIL: string
+}
+
+
+
+================================================
+FILE: apps/autorag/src/types.ts
+================================================
+import { z } from 'zod'
+
+export const pageParam = z.number().int().min(1).optional().default(1)
+export const perPageParam = z.number().int().min(1).max(50).optional().default(20)
+
+
+
+================================================
+FILE: apps/browser-rendering/package.json
+================================================
+{
+	"name": "cloudflare-browser-mcp-server",
+	"version": "0.1.9",
+	"private": true,
+	"scripts": {
+		"check:lint": "run-eslint-workers",
+		"check:types": "run-tsc",
+		"deploy": "run-wrangler-deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"types": "wrangler types --include-env=false",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@cloudflare/workers-oauth-provider": "0.0.13",
+		"@hono/zod-validator": "0.4.3",
+		"@modelcontextprotocol/sdk": "1.20.2",
+		"@repo/mcp-common": "workspace:*",
+		"@repo/mcp-observability": "workspace:*",
+		"agents": "0.2.19",
+		"cloudflare": "4.2.0",
+		"hono": "4.7.6",
+		"zod": "3.24.2"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "0.8.14",
+		"@types/node": "22.14.1",
+		"prettier": "3.5.3",
+		"typescript": "5.5.4",
+		"vitest": "3.0.9",
+		"wrangler": "4.10.0"
+	}
+}
+
+
+
+================================================
+FILE: apps/browser-rendering/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/workers.json",
+	"include": ["*/**.ts", "./vitest.config.ts", "./types.d.ts"]
+}
+
+
+
+================================================
+FILE: apps/browser-rendering/types.d.ts
+================================================
+import type { TestEnv } from './vitest.config'
+
+declare module 'cloudflare:test' {
+	interface ProvidedEnv extends TestEnv {}
+}
+
+
+
+================================================
+FILE: apps/browser-rendering/vitest.config.ts
+================================================
+import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
+
+import type { Env } from './src/browser.context'
+
+export interface TestEnv extends Env {
+	CLOUDFLARE_MOCK_ACCOUNT_ID: string
+	CLOUDFLARE_MOCK_API_TOKEN: string
+}
+
+export default defineWorkersConfig({
+	test: {
+		poolOptions: {
+			workers: {
+				wrangler: { configPath: `${__dirname}/wrangler.jsonc` },
+				miniflare: {
+					bindings: {
+						CLOUDFLARE_MOCK_ACCOUNT_ID: 'mock-account-id',
+						CLOUDFLARE_MOCK_API_TOKEN: 'mock-api-token',
+					} satisfies Partial<TestEnv>,
+				},
+			},
+		},
+	},
+})
+
+
+
+================================================
+FILE: apps/browser-rendering/.dev.vars.example
+================================================
+CLOUDFLARE_CLIENT_ID=
+CLOUDFLARE_CLIENT_SECRET=
+DEV_DISABLE_OAUTH=
+DEV_CLOUDFLARE_API_TOKEN=
+
+
+
+
+================================================
+FILE: apps/browser-rendering/.eslintrc.cjs
+================================================
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+	root: true,
+	extends: ['@repo/eslint-config/default.cjs'],
+}
+
+
+
+================================================
+FILE: apps/browser-rendering/src/browser.context.ts
+================================================
+import type { UserDetails } from '@repo/mcp-common/src/durable-objects/user_details.do'
+import type { BrowserMCP } from './browser.app'
+
+export interface Env {
+	OAUTH_KV: KVNamespace
+	MCP_COOKIE_ENCRYPTION_KEY: string
+	ENVIRONMENT: 'development' | 'staging' | 'production'
+	MCP_SERVER_NAME: string
+	MCP_SERVER_VERSION: string
+	CLOUDFLARE_CLIENT_ID: string
+	CLOUDFLARE_CLIENT_SECRET: string
+	MCP_OBJECT: DurableObjectNamespace<BrowserMCP>
+	USER_DETAILS: DurableObjectNamespace<UserDetails>
+	MCP_METRICS: AnalyticsEngineDataset
+	DEV_DISABLE_OAUTH: string
+	DEV_CLOUDFLARE_API_TOKEN: string
+	DEV_CLOUDFLARE_EMAIL: string
+}
+
+
+
+================================================
+FILE: apps/cloudflare-one-casb/README.md
+================================================
+# Model Context Protocol (MCP) Server + Cloudflare OAuth
+
+This is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) server that supports remote MCP connections, with Cloudflare OAuth built-in.
+
+You should use this as a template to build an MCP server for Cloudflare, provided by Cloudflare at `server-name.mcp.cloudflare.com`. It has a basic set of tools `apps/template-start-here/src/tools/logpush.tools.ts` — you can modify these to do what you need
+
+## Getting Started
+
+- Set secrets via Wrangler
+
+```bash
+wrangler secret put CLOUDFLARE_CLIENT_ID
+wrangler secret put CLOUDFLARE_CLIENT_SECRET
+```
+
+#### Set up a KV namespace
+
+- Create the KV namespace:
+  `wrangler kv:namespace create "OAUTH_KV"`
+- Update the Wrangler file with the KV ID
+
+#### Deploy & Test
+
+Deploy the MCP server to make it available on your workers.dev domain
+` wrangler deploy`
+
+Test the remote server using [Inspector](https://modelcontextprotocol.io/docs/tools/inspector):
+
+```
+npx wrangler deploy
+```
+
+
+
+================================================
+FILE: apps/cloudflare-one-casb/package.json
+================================================
+{
+	"name": "cloudflare-casb-mcp-server",
+	"version": "0.1.9",
+	"private": true,
+	"scripts": {
+		"check:lint": "run-eslint-workers",
+		"check:types": "run-tsc",
+		"deploy": "run-wrangler-deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"types": "wrangler types --include-env=false",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@cloudflare/workers-oauth-provider": "0.0.13",
+		"@hono/zod-validator": "0.4.3",
+		"@modelcontextprotocol/sdk": "1.20.2",
+		"@repo/mcp-common": "workspace:*",
+		"agents": "0.2.19",
+		"cloudflare": "4.2.0",
+		"hono": "4.7.6",
+		"zod": "3.24.2"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "0.8.14",
+		"@types/jsonwebtoken": "9.0.9",
+		"@types/node": "22.14.1",
+		"prettier": "3.5.3",
+		"typescript": "5.5.4",
+		"vitest": "3.0.9",
+		"wrangler": "4.10.0"
+	}
+}
+
+
+
+================================================
+FILE: apps/cloudflare-one-casb/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/workers.json",
+	"include": ["*/**.ts", "./types.d.ts", "./vitest.config.ts"]
+}
+
+
+
+================================================
+FILE: apps/cloudflare-one-casb/types.d.ts
+================================================
+import type { TestEnv } from './vitest.config'
+
+declare module 'cloudflare:test' {
+	interface ProvidedEnv extends TestEnv {}
+}
+
+
+
+================================================
+FILE: apps/cloudflare-one-casb/vitest.config.ts
+================================================
+import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
+
+import type { Env } from './src/cf1-casb.context'
+
+export interface TestEnv extends Env {
+	CLOUDFLARE_MOCK_ACCOUNT_ID: string
+	CLOUDFLARE_MOCK_API_TOKEN: string
+}
+
+export default defineWorkersConfig({
+	test: {
+		poolOptions: {
+			workers: {
+				wrangler: { configPath: `${__dirname}/wrangler.jsonc` },
+				miniflare: {
+					bindings: {
+						CLOUDFLARE_MOCK_ACCOUNT_ID: 'mock-account-id',
+						CLOUDFLARE_MOCK_API_TOKEN: 'mock-api-token',
+					} satisfies Partial<TestEnv>,
+				},
+			},
+		},
+	},
+})
+
+
+
+================================================
+FILE: apps/cloudflare-one-casb/.dev.vars.example
+================================================
+CLOUDFLARE_CLIENT_ID=
+CLOUDFLARE_CLIENT_SECRET=
+DEV_DISABLE_OAUTH=
+DEV_CLOUDFLARE_API_TOKEN=
+
+
+
+================================================
+FILE: apps/cloudflare-one-casb/.eslintrc.cjs
+================================================
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+	root: true,
+	extends: ['@repo/eslint-config/default.cjs'],
+}
+
+
+
+================================================
+FILE: apps/cloudflare-one-casb/src/cf1-casb.context.ts
+================================================
+import type { CASBMCP, UserDetails } from './cf1-casb.app'
+
+export interface Env {
+	ENVIRONMENT: 'development' | 'staging' | 'production'
+	MCP_SERVER_NAME: string
+	MCP_SERVER_VERSION: string
+	MCP_OBJECT: DurableObjectNamespace<CASBMCP>
+	MCP_METRICS: AnalyticsEngineDataset
+	AI: Ai
+	CLOUDFLARE_CLIENT_ID: string
+	CLOUDFLARE_CLIENT_SECRET: string
+	USER_DETAILS: DurableObjectNamespace<UserDetails>
+	DEV_DISABLE_OAUTH: string
+	DEV_CLOUDFLARE_API_TOKEN: string
+	DEV_CLOUDFLARE_EMAIL: string
+}
+
+
+
+================================================
+FILE: apps/demo-day/package.json
+================================================
+{
+	"name": "demo-day",
+	"version": "0.1.9",
+	"private": true,
+	"scripts": {
+		"check:types": "run-tsc",
+		"deploy": "run-wrangler-deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"types": "wrangler types --include-env=false",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@modelcontextprotocol/sdk": "1.20.2",
+		"@repo/mcp-common": "workspace:*",
+		"@repo/mcp-observability": "workspace:*",
+		"agents": "0.2.19",
+		"zod": "3.24.2"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "0.8.14",
+		"@types/node": "22.14.1",
+		"prettier": "3.5.3",
+		"typescript": "5.5.4",
+		"vitest": "3.0.9",
+		"wrangler": "4.10.0"
+	}
+}
+
+
+
+================================================
+FILE: apps/demo-day/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/workers.json",
+	"include": ["src/demo-day.app.ts"],
+	"compilerOptions": {
+		"types": ["@types/node"]
+	}
+}
+
+
+
+================================================
+FILE: apps/demo-day/.eslintrc.cjs
+================================================
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+	root: true,
+	extends: ['@repo/eslint-config/default.cjs'],
+}
+
+
+
+================================================
+FILE: apps/dex-analysis/package.json
+================================================
+{
+	"name": "dex-analysis",
+	"version": "0.3.0",
+	"private": true,
+	"scripts": {
+		"check:lint": "run-eslint-workers",
+		"check:types": "run-tsc",
+		"deploy": "run-wrangler-deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"types": "wrangler types --include-env=false",
+		"cf-typegen": "wrangler types",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@cloudflare/workers-oauth-provider": "0.0.13",
+		"@hono/zod-validator": "0.4.3",
+		"@modelcontextprotocol/sdk": "1.20.2",
+		"@repo/mcp-common": "workspace:*",
+		"@repo/mcp-observability": "workspace:*",
+		"agents": "0.2.19",
+		"cloudflare": "4.2.0",
+		"hono": "4.7.6",
+		"jszip": "3.10.1",
+		"zod": "3.24.2"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "0.8.14",
+		"@types/jsonwebtoken": "9.0.9",
+		"@types/node": "22.14.1",
+		"prettier": "3.5.3",
+		"typescript": "5.5.4",
+		"vitest": "3.0.9",
+		"wrangler": "4.10.0"
+	}
+}
+
+
+
+================================================
+FILE: apps/dex-analysis/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/workers.json",
+	"include": ["*/**.ts", "./vitest.config.ts", "./types.d.ts"]
+}
+
+
+
+================================================
+FILE: apps/dex-analysis/types.d.ts
+================================================
+import type { TestEnv } from './vitest.config'
+
+declare module 'cloudflare:test' {
+	interface ProvidedEnv extends TestEnv {}
+}
+
+
+
+================================================
+FILE: apps/dex-analysis/vitest.config.ts
+================================================
+import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
+
+import type { Env } from './src/dex-analysis.context'
+
+export interface TestEnv extends Env {
+	CLOUDFLARE_MOCK_ACCOUNT_ID: string
+	CLOUDFLARE_MOCK_API_TOKEN: string
+}
+
+export default defineWorkersConfig({
+	test: {
+		poolOptions: {
+			workers: {
+				wrangler: { configPath: `${__dirname}/wrangler.jsonc` },
+				miniflare: {
+					bindings: {
+						CLOUDFLARE_MOCK_ACCOUNT_ID: 'mock-account-id',
+						CLOUDFLARE_MOCK_API_TOKEN: 'mock-api-token',
+					} satisfies Partial<TestEnv>,
+				},
+			},
+		},
+	},
+})
+
+
+
+================================================
+FILE: apps/dex-analysis/.dev.vars.example
+================================================
+CLOUDFLARE_CLIENT_ID=
+CLOUDFLARE_CLIENT_SECRET=
+DEV_DISABLE_OAUTH=
+DEV_CLOUDFLARE_API_TOKEN=
+
+
+
+================================================
+FILE: apps/dex-analysis/.eslintrc.cjs
+================================================
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+	root: true,
+	extends: ['@repo/eslint-config/default.cjs'],
+}
+
+
+
+================================================
+FILE: apps/dex-analysis/src/dex-analysis.context.ts
+================================================
+import type { UserDetails } from '@repo/mcp-common/src/durable-objects/user_details.do'
+import type { CloudflareDEXMCP } from './dex-analysis.app'
+import type { WarpDiagReader } from './warp_diag_reader'
+
+export interface Env {
+	OAUTH_KV: KVNamespace
+	MCP_COOKIE_ENCRYPTION_KEY: string
+	ENVIRONMENT: 'development' | 'staging' | 'production'
+	MCP_SERVER_NAME: string
+	MCP_SERVER_VERSION: string
+	CLOUDFLARE_CLIENT_ID: string
+	CLOUDFLARE_CLIENT_SECRET: string
+	MCP_OBJECT: DurableObjectNamespace<CloudflareDEXMCP>
+	USER_DETAILS: DurableObjectNamespace<UserDetails>
+	WARP_DIAG_READER: DurableObjectNamespace<WarpDiagReader>
+	MCP_METRICS: AnalyticsEngineDataset
+	DEV_DISABLE_OAUTH: string
+	DEV_CLOUDFLARE_API_TOKEN: string
+	DEV_CLOUDFLARE_EMAIL: string
+}
+
+
+
+================================================
+FILE: apps/dns-analytics/package.json
+================================================
+{
+	"name": "dns-analytics",
+	"version": "0.1.10",
+	"private": true,
+	"scripts": {
+		"check:lint": "run-eslint-workers",
+		"check:types": "run-tsc",
+		"deploy": "run-wrangler-deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"types": "wrangler types --include-env=false",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@cloudflare/workers-oauth-provider": "0.0.13",
+		"@hono/zod-validator": "0.4.3",
+		"@modelcontextprotocol/sdk": "1.20.2",
+		"@repo/mcp-common": "workspace:*",
+		"@repo/mcp-observability": "workspace:*",
+		"agents": "0.2.19",
+		"cloudflare": "4.2.0",
+		"hono": "4.7.6",
+		"zod": "3.24.2"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "0.8.14",
+		"@types/node": "22.14.1",
+		"prettier": "3.5.3",
+		"typescript": "5.5.4",
+		"vitest": "3.0.9",
+		"wrangler": "4.10.0"
+	}
+}
+
+
+
+================================================
+FILE: apps/dns-analytics/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/workers.json",
+	"include": ["*/**.ts", "./worker-configuration.d.ts", "./types.d.ts", "./vitest.config.ts"]
+}
+
+
+
+================================================
+FILE: apps/dns-analytics/types.d.ts
+================================================
+import type { TestEnv } from './vitest.config'
+
+declare module 'cloudflare:test' {
+	interface ProvidedEnv extends TestEnv {}
+}
+
+
+
+================================================
+FILE: apps/dns-analytics/vitest.config.ts
+================================================
+import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
+
+export interface TestEnv extends Env {
+	CLOUDFLARE_MOCK_ACCOUNT_ID: string
+	CLOUDFLARE_MOCK_API_TOKEN: string
+}
+
+export default defineWorkersConfig({
+	test: {
+		poolOptions: {
+			workers: {
+				wrangler: { configPath: `${__dirname}/wrangler.jsonc` },
+				miniflare: {
+					bindings: {
+						CLOUDFLARE_MOCK_ACCOUNT_ID: 'mock-account-id',
+						CLOUDFLARE_MOCK_API_TOKEN: 'mock-api-token',
+					} satisfies Partial<TestEnv>,
+				},
+			},
+		},
+	},
+})
+
+
+
+================================================
+FILE: apps/dns-analytics/.dev.vars.example
+================================================
+CLOUDFLARE_CLIENT_ID=
+CLOUDFLARE_CLIENT_SECRET=
+DEV_CLOUDFLARE_API_TOKEN=
+
+
+================================================
+FILE: apps/dns-analytics/.eslintrc.cjs
+================================================
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+	root: true,
+	extends: ['@repo/eslint-config/default.cjs'],
+}
+
+
+
+================================================
+FILE: apps/dns-analytics/src/dns-analytics.context.ts
+================================================
+import type { UserDetails } from '@repo/mcp-common/src/durable-objects/user_details.do'
+import type { DNSAnalyticsMCP } from './dns-analytics.app'
+
+export interface Env {
+	OAUTH_KV: KVNamespace
+	MCP_COOKIE_ENCRYPTION_KEY: string
+	ENVIRONMENT: 'development' | 'staging' | 'production'
+	MCP_SERVER_NAME: string
+	MCP_SERVER_VERSION: string
+	CLOUDFLARE_CLIENT_ID: string
+	CLOUDFLARE_CLIENT_SECRET: string
+	MCP_OBJECT: DurableObjectNamespace<DNSAnalyticsMCP>
+	USER_DETAILS: DurableObjectNamespace<UserDetails>
+	MCP_METRICS: AnalyticsEngineDataset
+	SENTRY_ACCESS_CLIENT_ID: string
+	SENTRY_ACCESS_CLIENT_SECRET: string
+	GIT_HASH: string
+	SENTRY_DSN: string
+	DEV_DISABLE_OAUTH: string
+	DEV_CLOUDFLARE_API_TOKEN: string
+	DEV_CLOUDFLARE_EMAIL: string
+}
+
+
+
+================================================
+FILE: apps/docs-ai-search/package.json
+================================================
+{
+	"name": "docs-ai-search",
+	"version": "0.4.4",
+	"private": true,
+	"scripts": {
+		"check:lint": "run-eslint-workers",
+		"check:types": "run-tsc",
+		"deploy": "run-wrangler-deploy",
+		"dev": "wrangler dev",
+		"start": "npm run dev",
+		"types": "wrangler types --include-env=false",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@cloudflare/workers-oauth-provider": "0.0.13",
+		"@hono/zod-validator": "0.4.3",
+		"@modelcontextprotocol/sdk": "1.20.2",
+		"@repo/mcp-common": "workspace:*",
+		"@repo/mcp-observability": "workspace:*",
+		"agents": "0.2.19",
+		"cloudflare": "4.2.0",
+		"hono": "4.7.6",
+		"mime": "4.0.6",
+		"zod": "3.24.2"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "0.8.14",
+		"@types/node": "22.14.1",
+		"prettier": "3.5.3",
+		"typescript": "5.5.4",
+		"vitest": "3.0.9",
+		"wrangler": "4.10.0"
+	}
+}
+
+
+
+================================================
+FILE: apps/docs-ai-search/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/workers.json",
+	"include": ["*/**.ts", "./vitest.config.ts"]
+}
+
+
+
+================================================
+FILE: apps/docs-ai-search/vitest.config.ts
+================================================
+import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
+
+import type { Env } from './src/docs-ai-search.context'
+
+export interface TestEnv extends Env {
+	CLOUDFLARE_MOCK_ACCOUNT_ID: string
+	CLOUDFLARE_MOCK_API_TOKEN: string
+}
+
+export default defineWorkersConfig({
+	test: {
+		poolOptions: {
+			workers: {
+				wrangler: { configPath: `${__dirname}/wrangler.jsonc` },
+				miniflare: {
+					bindings: {
+						CLOUDFLARE_MOCK_ACCOUNT_ID: 'mock-account-id',
+						CLOUDFLARE_MOCK_API_TOKEN: 'mock-api-token',
+					} satisfies Partial<TestEnv>,
+				},
+			},
+		},
+	},
+})
+
+
+
+================================================
+FILE: apps/docs-ai-search/.eslintrc.cjs
+================================================
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+	root: true,
+	extends: ['@repo/eslint-config/default.cjs'],
+}
+
+
+
+================================================
+FILE: apps/docs-ai-search/src/docs-ai-search.context.ts
+================================================
+import type { CloudflareDocumentationMCP } from './docs-ai-search.app'
+
+export interface Env {
+	ENVIRONMENT: 'development' | 'staging' | 'production'
+	MCP_SERVER_NAME: string
+	MCP_SERVER_VERSION: string
+	MCP_OBJECT: DurableObjectNamespace<CloudflareDocumentationMCP>
+	MCP_METRICS: AnalyticsEngineDataset
+	SENTRY_ACCESS_CLIENT_ID: string
+	SENTRY_ACCESS_CLIENT_SECRET: string
+	GIT_HASH: string
+	SENTRY_DSN: string
+	AI: Ai
+}
+
+
+
+================================================
+FILE: apps/docs-autorag/README.md
+================================================
+# Model Context Protocol (MCP) Server + Cloudflare Documentation (via Autorag)
+
+This is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) server that supports remote MCP connections. It connects to an autorag instance (in this case, Cloudflare docs)
+
+To run this server, you'll need access to an autorag instance which has indexed the contents of cloudflare-docs: https://github.com/cloudflare/cloudflare-docs/
+
+The Cloudflare account this worker is deployed on already has this Autorag instance setup and indexed.
+
+## Running locally
+
+```
+pnpm run start
+```
+
+Then connect to the server via remote MCP at `http://localhost:8976/mcp`
+
+## Deploying
+
+```
+pnpm run deploy --env [ENVIRONMENT]
+```
+
+
+
+================================================
+FILE: apps/docs-autorag/package.json
+================================================
+{
+	"name": "docs-autorag",
+	"version": "0.1.9",
+	"private": true,
+	"scripts": {
+		"check:lint": "run-eslint-workers",
+		"check:types": "run-tsc",
+		"deploy": "run-wrangler-deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"types": "wrangler types --include-env=false",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@cloudflare/workers-oauth-provider": "0.0.13",
+		"@hono/zod-validator": "0.4.3",
+		"@modelcontextprotocol/sdk": "1.20.2",
+		"@repo/mcp-common": "workspace:*",
+		"@repo/mcp-observability": "workspace:*",
+		"agents": "0.2.19",
+		"cloudflare": "4.2.0",
+		"hono": "4.7.6",
+		"mime": "4.0.6",
+		"zod": "3.24.2"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "0.8.14",
+		"@types/node": "22.14.1",
+		"prettier": "3.5.3",
+		"typescript": "5.5.4",
+		"vitest": "3.0.9",
+		"wrangler": "4.10.0"
+	}
+}
+
+
+
+================================================
+FILE: apps/docs-autorag/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/workers.json",
+	"include": ["*/**.ts", "./vitest.config.ts"]
+}
+
+
+
+================================================
+FILE: apps/docs-autorag/vitest.config.ts
+================================================
+import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
+
+import type { Env } from './src/docs-autorag.context'
+
+export interface TestEnv extends Env {
+	CLOUDFLARE_MOCK_ACCOUNT_ID: string
+	CLOUDFLARE_MOCK_API_TOKEN: string
+}
+
+export default defineWorkersConfig({
+	test: {
+		poolOptions: {
+			workers: {
+				wrangler: { configPath: `${__dirname}/wrangler.jsonc` },
+				miniflare: {
+					bindings: {
+						CLOUDFLARE_MOCK_ACCOUNT_ID: 'mock-account-id',
+						CLOUDFLARE_MOCK_API_TOKEN: 'mock-api-token',
+					} satisfies Partial<TestEnv>,
+				},
+			},
+		},
+	},
+})
+
+
+
+================================================
+FILE: apps/docs-autorag/.eslintrc.cjs
+================================================
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+	root: true,
+	extends: ['@repo/eslint-config/default.cjs'],
+}
+
+
+
+================================================
+FILE: apps/docs-autorag/src/docs-autorag.app.ts
+================================================
+import { McpAgent } from 'agents/mcp'
+
+import { createApiHandler } from '@repo/mcp-common/src/api-handler'
+import { getEnv } from '@repo/mcp-common/src/env'
+import { CloudflareMCPServer } from '@repo/mcp-common/src/server'
+
+import { registerDocsTools } from './tools/docs-autorag.tools'
+
+import type { Env } from './docs-autorag.context'
+
+const env = getEnv<Env>()
+
+// The docs MCP server isn't stateful, so we don't have state/props
+export type Props = never
+
+export type State = never
+
+export class CloudflareDocumentationMCP extends McpAgent<Env, State, Props> {
+	server = new CloudflareMCPServer({
+		wae: env.MCP_METRICS,
+		serverInfo: {
+			name: env.MCP_SERVER_NAME,
+			version: env.MCP_SERVER_VERSION,
+		},
+	})
+
+	constructor(
+		public ctx: DurableObjectState,
+		public env: Env
+	) {
+		super(ctx, env)
+	}
+
+	async init() {
+		registerDocsTools(this)
+	}
+}
+
+export default createApiHandler(CloudflareDocumentationMCP)
+
+
+
+================================================
+FILE: apps/docs-autorag/src/docs-autorag.context.ts
+================================================
+import type { CloudflareDocumentationMCP } from './docs-autorag.app'
+
+export interface Env {
+	ENVIRONMENT: 'development' | 'staging' | 'production'
+	AUTORAG_NAME: 'cloudflare-docs-autorag'
+	MCP_SERVER_NAME: string
+	MCP_SERVER_VERSION: string
+	MCP_OBJECT: DurableObjectNamespace<CloudflareDocumentationMCP>
+	MCP_METRICS: AnalyticsEngineDataset
+	AI: Ai
+}
+
+
+
+================================================
+FILE: apps/docs-vectorize/package.json
+================================================
+{
+	"name": "docs-vectorize",
+	"version": "0.5.1",
+	"private": true,
+	"scripts": {
+		"check:lint": "run-eslint-workers",
+		"check:types": "run-tsc",
+		"deploy": "run-wrangler-deploy",
+		"dev": "wrangler dev --experimental-vectorize-bind-to-prod",
+		"start": "npm run dev",
+		"types": "wrangler types --include-env=false",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@cloudflare/workers-oauth-provider": "0.0.13",
+		"@hono/zod-validator": "0.4.3",
+		"@modelcontextprotocol/sdk": "1.20.2",
+		"@repo/mcp-common": "workspace:*",
+		"@repo/mcp-observability": "workspace:*",
+		"agents": "0.2.19",
+		"cloudflare": "4.2.0",
+		"hono": "4.7.6",
+		"mime": "4.0.6",
+		"zod": "3.24.2"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "0.8.14",
+		"@types/node": "22.14.1",
+		"prettier": "3.5.3",
+		"typescript": "5.5.4",
+		"vitest": "3.0.9",
+		"wrangler": "4.10.0"
+	}
+}
+
+
+
+================================================
+FILE: apps/docs-vectorize/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/workers.json",
+	"include": ["*/**.ts", "./vitest.config.ts"]
+}
+
+
+
+================================================
+FILE: apps/docs-vectorize/vitest.config.ts
+================================================
+import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
+
+import type { Env } from './src/docs-vectorize.context'
+
+export interface TestEnv extends Env {
+	CLOUDFLARE_MOCK_ACCOUNT_ID: string
+	CLOUDFLARE_MOCK_API_TOKEN: string
+}
+
+export default defineWorkersConfig({
+	test: {
+		poolOptions: {
+			workers: {
+				wrangler: { configPath: `${__dirname}/wrangler.jsonc` },
+				miniflare: {
+					bindings: {
+						CLOUDFLARE_MOCK_ACCOUNT_ID: 'mock-account-id',
+						CLOUDFLARE_MOCK_API_TOKEN: 'mock-api-token',
+					} satisfies Partial<TestEnv>,
+				},
+			},
+		},
+	},
+})
+
+
+
+================================================
+FILE: apps/docs-vectorize/.eslintrc.cjs
+================================================
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+	root: true,
+	extends: ['@repo/eslint-config/default.cjs'],
+}
+
+
+
+================================================
+FILE: apps/docs-vectorize/src/docs-vectorize.context.ts
+================================================
+import type { CloudflareDocumentationMCP } from './docs-vectorize.app'
+
+export interface Env {
+	ENVIRONMENT: 'development' | 'staging' | 'production'
+	MCP_SERVER_NAME: string
+	MCP_SERVER_VERSION: string
+	MCP_OBJECT: DurableObjectNamespace<CloudflareDocumentationMCP>
+	MCP_METRICS: AnalyticsEngineDataset
+	SENTRY_ACCESS_CLIENT_ID: string
+	SENTRY_ACCESS_CLIENT_SECRET: string
+	GIT_HASH: string
+	SENTRY_DSN: string
+	AI: Ai
+	VECTORIZE: VectorizeIndex
+}
+
+
+
+================================================
+FILE: apps/graphql/package.json
+================================================
+{
+	"name": "graphql-mcp-server",
+	"version": "0.1.9",
+	"private": true,
+	"scripts": {
+		"check:lint": "run-eslint-workers",
+		"check:types": "run-tsc",
+		"deploy": "run-wrangler-deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"types": "wrangler types --include-env=false",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@cloudflare/workers-oauth-provider": "0.0.13",
+		"@hono/zod-validator": "0.4.3",
+		"@modelcontextprotocol/sdk": "1.20.2",
+		"@repo/mcp-common": "workspace:*",
+		"@repo/mcp-observability": "workspace:*",
+		"agents": "0.2.19",
+		"cloudflare": "4.2.0",
+		"hono": "4.7.6",
+		"zod": "3.24.2",
+		"lz-string": "1.5.0"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "0.8.14",
+		"@types/node": "22.14.1",
+		"prettier": "3.5.3",
+		"typescript": "5.5.4",
+		"vitest": "3.0.9",
+		"wrangler": "4.10.0"
+	}
+}
+
+
+
+================================================
+FILE: apps/graphql/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/workers.json",
+	"include": ["*/**.ts", "./vitest.config.ts", "./types.d.ts"]
+}
+
+
+
+================================================
+FILE: apps/graphql/types.d.ts
+================================================
+import type { TestEnv } from './vitest.config'
+
+declare module 'cloudflare:test' {
+	interface ProvidedEnv extends TestEnv {}
+}
+
+
+
+================================================
+FILE: apps/graphql/.eslintrc.cjs
+================================================
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+	root: true,
+	extends: ['@repo/eslint-config/default.cjs'],
+}
+
+
+
+================================================
+FILE: apps/graphql/src/graphql.context.ts
+================================================
+import type { GraphQLMCP, UserDetails } from './graphql.app'
+
+export interface Env {
+	OAUTH_KV: KVNamespace
+	MCP_COOKIE_ENCRYPTION_KEY: string
+	ENVIRONMENT: 'development' | 'staging' | 'production'
+	MCP_SERVER_NAME: string
+	MCP_SERVER_VERSION: string
+	CLOUDFLARE_CLIENT_ID: string
+	CLOUDFLARE_CLIENT_SECRET: string
+	MCP_OBJECT: DurableObjectNamespace<GraphQLMCP>
+	USER_DETAILS: DurableObjectNamespace<UserDetails>
+	MCP_METRICS: AnalyticsEngineDataset
+	SENTRY_ACCESS_CLIENT_ID: string
+	SENTRY_ACCESS_CLIENT_SECRET: string
+	GIT_HASH: string
+	SENTRY_DSN: string
+	DEV_DISABLE_OAUTH: string
+	DEV_CLOUDFLARE_API_TOKEN: string
+	DEV_CLOUDFLARE_EMAIL: string
+}
+
+
+
+================================================
+FILE: apps/logpush/package.json
+================================================
+{
+	"name": "logpush",
+	"version": "0.1.10",
+	"private": true,
+	"scripts": {
+		"check:lint": "run-eslint-workers",
+		"check:types": "run-tsc",
+		"deploy": "run-wrangler-deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"types": "wrangler types --include-env=false",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@cloudflare/workers-oauth-provider": "0.0.13",
+		"@hono/zod-validator": "0.4.3",
+		"@modelcontextprotocol/sdk": "1.20.2",
+		"@repo/mcp-common": "workspace:*",
+		"@repo/mcp-observability": "workspace:*",
+		"agents": "0.2.19",
+		"cloudflare": "4.2.0",
+		"hono": "4.7.6",
+		"zod": "3.24.2"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "0.8.14",
+		"@types/node": "22.14.1",
+		"prettier": "3.5.3",
+		"typescript": "5.5.4",
+		"vitest": "3.0.9",
+		"wrangler": "4.10.0"
+	}
+}
+
+
+
+================================================
+FILE: apps/logpush/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/workers.json",
+	"include": ["*/**.ts", "./vitest.config.ts", "./types.d.ts"]
+}
+
+
+
+================================================
+FILE: apps/logpush/types.d.ts
+================================================
+import type { TestEnv } from './vitest.config'
+
+declare module 'cloudflare:test' {
+	interface ProvidedEnv extends TestEnv {}
+}
+
+
+
+================================================
+FILE: apps/logpush/vitest.config.ts
+================================================
+import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
+
+import type { Env } from './src/logpush.context'
+
+export interface TestEnv extends Env {
+	CLOUDFLARE_MOCK_ACCOUNT_ID: string
+	CLOUDFLARE_MOCK_API_TOKEN: string
+}
+
+export default defineWorkersConfig({
+	test: {
+		poolOptions: {
+			workers: {
+				wrangler: { configPath: `${__dirname}/wrangler.jsonc` },
+				miniflare: {
+					bindings: {
+						CLOUDFLARE_MOCK_ACCOUNT_ID: 'mock-account-id',
+						CLOUDFLARE_MOCK_API_TOKEN: 'mock-api-token',
+					} satisfies Partial<TestEnv>,
+				},
+			},
+		},
+	},
+})
+
+
+
+================================================
+FILE: apps/logpush/.dev.vars.example
+================================================
+CLOUDFLARE_CLIENT_ID=
+CLOUDFLARE_CLIENT_SECRET=
+DEV_DISABLE_OAUTH=
+DEV_CLOUDFLARE_API_TOKEN=
+
+
+
+================================================
+FILE: apps/logpush/.eslintrc.cjs
+================================================
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+	root: true,
+	extends: ['@repo/eslint-config/default.cjs'],
+}
+
+
+
+================================================
+FILE: apps/logpush/src/logpush.context.ts
+================================================
+import type { UserDetails } from '@repo/mcp-common/src/durable-objects/user_details.do'
+import type { LogsMCP } from './logpush.app'
+
+export interface Env {
+	OAUTH_KV: KVNamespace
+	MCP_COOKIE_ENCRYPTION_KEY: string
+	ENVIRONMENT: 'development' | 'staging' | 'production'
+	MCP_SERVER_NAME: string
+	MCP_SERVER_VERSION: string
+	CLOUDFLARE_CLIENT_ID: string
+	CLOUDFLARE_CLIENT_SECRET: string
+	MCP_OBJECT: DurableObjectNamespace<LogsMCP>
+	USER_DETAILS: DurableObjectNamespace<UserDetails>
+	MCP_METRICS: AnalyticsEngineDataset
+	DEV_DISABLE_OAUTH: string
+	DEV_CLOUDFLARE_API_TOKEN: string
+	DEV_CLOUDFLARE_EMAIL: string
+}
+
+
+
+================================================
+FILE: apps/radar/package.json
+================================================
+{
+	"name": "cloudflare-radar-mcp-server",
+	"version": "0.1.9",
+	"private": true,
+	"scripts": {
+		"check:lint": "run-eslint-workers",
+		"check:types": "run-tsc",
+		"deploy": "run-wrangler-deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"types": "wrangler types --include-env=false",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@cloudflare/workers-oauth-provider": "0.0.13",
+		"@hono/zod-validator": "0.4.3",
+		"@modelcontextprotocol/sdk": "1.20.2",
+		"@repo/mcp-common": "workspace:*",
+		"@repo/mcp-observability": "workspace:*",
+		"agents": "0.2.19",
+		"cloudflare": "4.2.0",
+		"hono": "4.7.6",
+		"zod": "3.24.2"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "0.8.14",
+		"@types/node": "22.14.1",
+		"prettier": "3.5.3",
+		"typescript": "5.5.4",
+		"vitest": "3.0.9",
+		"wrangler": "4.10.0"
+	}
+}
+
+
+
+================================================
+FILE: apps/radar/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/workers.json",
+	"include": ["*/**.ts", "./vitest.config.ts", "./types.d.ts"]
+}
+
+
+
+================================================
+FILE: apps/radar/types.d.ts
+================================================
+import type { TestEnv } from './vitest.config'
+
+declare module 'cloudflare:test' {
+	interface ProvidedEnv extends TestEnv {}
+}
+
+
+
+================================================
+FILE: apps/radar/vitest.config.ts
+================================================
+import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
+
+import type { Env } from './src/radar.context'
+
+export interface TestEnv extends Env {
+	CLOUDFLARE_MOCK_ACCOUNT_ID: string
+	CLOUDFLARE_MOCK_API_TOKEN: string
+}
+
+export default defineWorkersConfig({
+	test: {
+		poolOptions: {
+			workers: {
+				wrangler: { configPath: `${__dirname}/wrangler.jsonc` },
+				miniflare: {
+					bindings: {
+						CLOUDFLARE_MOCK_ACCOUNT_ID: 'mock-account-id',
+						CLOUDFLARE_MOCK_API_TOKEN: 'mock-api-token',
+					} satisfies Partial<TestEnv>,
+				},
+			},
+		},
+	},
+})
+
+
+
+================================================
+FILE: apps/radar/.dev.vars.example
+================================================
+CLOUDFLARE_CLIENT_ID=
+CLOUDFLARE_CLIENT_SECRET=
+DEV_DISABLE_OAUTH=
+DEV_CLOUDFLARE_API_TOKEN=
+
+
+
+
+================================================
+FILE: apps/radar/.eslintrc.cjs
+================================================
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+	root: true,
+	extends: ['@repo/eslint-config/default.cjs'],
+}
+
+
+
+================================================
+FILE: apps/radar/src/utils.ts
+================================================
+/**
+ * Resolves and invokes a method dynamically based on the provided slugs.
+ *
+ * This function traverses the object based on the `slugs` array, binds the method
+ * to its correct context, and invokes it with the provided parameters.
+ *
+ * @param {Object} client - The root object (e.g., `client.radar.http`) to resolve methods from.
+ * @param {string[]} path - The path to the desired method.
+ * @param {Object} params - The parameters to pass when invoking the resolved method.
+ * @returns {Promise<any>} The result of the method invocation.
+ */
+export async function resolveAndInvoke(client: any, path: string, params: any): Promise<any> {
+	const slugs = path.split('/')
+	const method = slugs.reduce((acc, key) => acc?.[key], client)
+	const parentContext = slugs.slice(0, -1).reduce((acc, key) => acc?.[key], client)
+	return await method.bind(parentContext)(params)
+}
+
+
+
+================================================
+FILE: apps/sandbox-container/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/workers.json",
+	"include": ["*/**.ts", "./vitest.config.evals.ts", "./types.d.ts"],
+	"exclude": ["container/**.ts"]
+}
+
+
+
+================================================
+FILE: apps/sandbox-container/types.d.ts
+================================================
+declare module 'cloudflare:test' {
+	interface ProvidedEnv {
+		OPENAI_API_KEY: 'TODO'
+		AI_GATEWAY_TOKEN: string
+		CLOUDFLARE_ACCOUNT_ID: string
+		AI_GATEWAY_ID: string
+		AI: Ai
+	}
+}
+
+
+
+================================================
+FILE: apps/sandbox-container/vitest.config.evals.ts
+================================================
+import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
+
+export default defineWorkersConfig({
+	test: {
+		include: ['**/*.eval.?(c|m)[jt]s?(x)'],
+		poolOptions: {
+			workers: {
+				isolatedStorage: true,
+				wrangler: { configPath: './wrangler.jsonc' },
+				miniflare: {
+					bindings: {
+						ENVIRONMENT: 'test',
+					},
+				},
+			},
+		},
+	},
+})
+
+
+
+================================================
+FILE: apps/sandbox-container/.dev.vars.example
+================================================
+CLOUDFLARE_CLIENT_ID=
+CLOUDFLARE_CLIENT_SECRET=
+DEV_DISABLE_OAUTH=
+DEV_CLOUDFLARE_API_TOKEN=
+
+
+
+================================================
+FILE: apps/sandbox-container/.eslintrc.cjs
+================================================
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+	root: true,
+	extends: ['@repo/eslint-config/default.cjs'],
+}
+
+
+
+================================================
+FILE: apps/sandbox-container/container/tsconfig.json
+================================================
+{
+	"compilerOptions": {
+		"lib": ["es2023"],
+		"module": "ES2022",
+		"target": "es2022",
+		"types": ["@types/node"],
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"moduleResolution": "bundler",
+		"noEmit": true,
+		"allowImportingTsExtensions": true
+	},
+	"include": ["**/*.ts"],
+	"exclude": []
+}
+
+
+
+================================================
+FILE: apps/sandbox-container/evals/initialize.eval.ts
+================================================
+import { describeEval } from 'vitest-evals'
+
+import { runTask } from '@repo/eval-tools/src/runTask'
+import { checkFactuality } from '@repo/eval-tools/src/scorers'
+import { eachModel } from '@repo/eval-tools/src/test-models'
+
+import { initializeClient } from './utils'
+
+eachModel('$modelName', ({ model }) => {
+	describeEval('Runs container initialize', {
+		data: async () => [
+			{
+				input: 'create and ping a container',
+				expected:
+					'The container_initialize tool was called and then the container_ping tool was called',
+			},
+		],
+		task: async (input) => {
+			const client = await initializeClient()
+			const { promptOutput } = await runTask(client, model, input)
+			return promptOutput
+		},
+		scorers: [checkFactuality],
+		threshold: 1,
+		timeout: 60000,
+	})
+})
+
+
+
+================================================
+FILE: apps/sandbox-container/evals/utils.ts
+================================================
+import { MCPClientManager } from 'agents/mcp/client'
+
+export async function initializeClient(): Promise<MCPClientManager> {
+	const clientManager = new MCPClientManager('test-client', '0.0.0')
+	await clientManager.connect('http://localhost:8976/sse')
+	return clientManager
+}
+
+
+
+================================================
+FILE: apps/sandbox-container/server/metrics.ts
+================================================
+import { MetricsEvent, MetricsEventIndexIds } from '@repo/mcp-observability'
+
+export class ContainerEvent extends MetricsEvent {
+	constructor(
+		private containers: {
+			active?: number
+		}
+	) {
+		super()
+	}
+
+	toDataPoint(): AnalyticsEngineDataPoint {
+		return {
+			indexes: [MetricsEventIndexIds.CONTAINER_MANAGER],
+			doubles: this.mapDoubles({
+				double1: this.containers.active,
+			}),
+		}
+	}
+}
+
+
+
+================================================
+FILE: apps/sandbox-container/server/sandbox.server.context.ts
+================================================
+import type { ContainerManager, ContainerMcpAgent, UserContainer } from './sandbox.server.app'
+
+export interface Env {
+	OAUTH_KV: KVNamespace
+	MCP_COOKIE_ENCRYPTION_KEY: string
+	CLOUDFLARE_CLIENT_ID: string
+	CLOUDFLARE_CLIENT_SECRET: string
+	ENVIRONMENT: 'dev'
+	MCP_SERVER_NAME: string
+	MCP_SERVER_VERSION: string
+	OPENAI_API_KEY: string
+	AI_GATEWAY_TOKEN: string
+	CLOUDFLARE_ACCOUNT_ID: string
+	AI_GATEWAY_ID: string
+	MCP_OBJECT: DurableObjectNamespace<ContainerMcpAgent>
+	CONTAINER_MANAGER: DurableObjectNamespace<ContainerManager>
+	USER_CONTAINER: DurableObjectNamespace<UserContainer>
+	USER_BLOCKLIST: KVNamespace
+	MCP_METRICS: AnalyticsEngineDataset
+	AI: Ai
+	DEV_DISABLE_OAUTH: string
+	DEV_CLOUDFLARE_API_TOKEN: string
+	DEV_CLOUDFLARE_EMAIL: string
+}
+
+
+
+================================================
+FILE: apps/sandbox-container/server/utils.spec.ts
+================================================
+import { describe, expect, it } from 'vitest'
+
+import { stripProtocolFromFilePath } from './utils'
+
+describe('get_file_name_from_path', () => {
+	it('strips file:// protocol from path', async () => {
+		const path = await stripProtocolFromFilePath('file:///files/contents/cats')
+		expect(path).toBe('/files/contents/cats')
+	}),
+		it('leaves protocol-less paths untouched', async () => {
+			const path = await stripProtocolFromFilePath('/files/contents/cats')
+			expect(path).toBe('/files/contents/cats')
+		})
+})
+
+
+
+================================================
+FILE: apps/sandbox-container/server/utils.ts
+================================================
+export async function fileToBase64(blob: Blob): Promise<string> {
+	// Use ArrayBuffer instead of text() for binary data
+	const arrayBuffer = await blob.arrayBuffer()
+	const byteArray = new Uint8Array(arrayBuffer)
+
+	// Convert byte array to base64 string
+	let binary = ''
+	byteArray.forEach((byte) => {
+		binary += String.fromCharCode(byte)
+	})
+
+	// Apply base64 encoding
+	return btoa(binary)
+}
+
+// Used for file related tool calls in case the llm sends a full resource URI
+export async function stripProtocolFromFilePath(path: string): Promise<string> {
+	return path.startsWith('file://') ? path.replace('file://', '') : path
+}
+
+
+
+================================================
+FILE: apps/sandbox-container/shared/consts.ts
+================================================
+// Set this to the open port on your container
+export const OPEN_CONTAINER_PORT = 8080
+
+
+
+================================================
+FILE: apps/sandbox-container/shared/schema.ts
+================================================
+import z from 'zod'
+
+export type ExecParams = z.infer<typeof ExecParams>
+export const ExecParams = z.object({
+	args: z.string(),
+	timeout: z.number().optional().describe('Timeout in milliseconds'),
+	streamStderr: z.boolean().default(true),
+})
+
+export type FileWrite = z.infer<typeof FileWrite>
+export const FileWrite = z.object({
+	path: z.string(),
+	text: z.string().describe('Full text content of the file you want to write.'),
+})
+
+export type FilePathParam = z.infer<typeof FilePathParam>
+export const FilePathParam = z.object({
+	path: z.string(),
+})
+
+export type FileList = z.infer<typeof FileList>
+export const FileList = z.object({
+	resources: z
+		.object({
+			uri: z.string(),
+			name: z.string(),
+			description: z.string().optional(),
+			mimeType: z.string().optional(),
+		})
+		.array(),
+})
+
+export type FilesContextSchema = z.infer<typeof FilesContextSchema>
+export const FilesContextSchema = z.object({
+	files: z
+		.object({
+			uri: z.string(),
+		})
+		.array(),
+})
+
+
+
+================================================
+FILE: apps/workers-bindings/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/workers.json",
+	"include": ["*/**.ts", "./vitest.config.evals.ts"]
+}
+
+
+
+================================================
+FILE: apps/workers-bindings/vitest.config.evals.ts
+================================================
+import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
+
+export default defineWorkersConfig({
+	test: {
+		include: ['**/*.eval.?(c|m)[jt]s?(x)'],
+		poolOptions: {
+			workers: {
+				isolatedStorage: true,
+				wrangler: { configPath: './wrangler.jsonc' },
+				miniflare: {
+					bindings: {
+						ENVIRONMENT: 'test',
+					},
+				},
+			},
+		},
+	},
+})
+
+
+
+================================================
+FILE: apps/workers-bindings/vitest.config.ts
+================================================
+import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
+
+import type { Env } from './src/bindings.context'
+
+export interface TestEnv extends Env {
+	CLOUDFLARE_MOCK_ACCOUNT_ID: string
+	CLOUDFLARE_MOCK_API_TOKEN: string
+}
+
+export default defineWorkersConfig({
+	test: {
+		poolOptions: {
+			workers: {
+				wrangler: { configPath: `${__dirname}/wrangler.jsonc` },
+				miniflare: {
+					bindings: {
+						CLOUDFLARE_MOCK_ACCOUNT_ID: 'mock-account-id',
+						CLOUDFLARE_MOCK_API_TOKEN: 'mock-api-token',
+					} satisfies Partial<TestEnv>,
+				},
+			},
+		},
+	},
+})
+
+
+
+================================================
+FILE: apps/workers-bindings/.dev.vars.example
+================================================
+CLOUDFLARE_CLIENT_ID=
+CLOUDFLARE_CLIENT_SECRET=
+DEV_DISABLE_OAUTH=
+DEV_CLOUDFLARE_API_TOKEN=
+
+
+
+================================================
+FILE: apps/workers-bindings/.eslintrc.cjs
+================================================
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+	root: true,
+	extends: ['@repo/eslint-config/default.cjs'],
+}
+
+
+
+================================================
+FILE: apps/workers-bindings/evals/types.d.ts
+================================================
+import type { TestEnv } from '../vitest.config'
+
+declare module 'cloudflare:test' {
+	interface ProvidedEnv extends TestEnv {}
+}
+
+
+
+================================================
+FILE: apps/workers-bindings/evals/utils.ts
+================================================
+import { MCPClientManager } from 'agents/mcp/client'
+
+export async function initializeClient(): Promise<MCPClientManager> {
+	const clientManager = new MCPClientManager('test-client', '0.0.0')
+	await clientManager.connect('http://localhost:8977/sse')
+	return clientManager
+}
+
+
+
+================================================
+FILE: apps/workers-bindings/src/bindings.context.ts
+================================================
+import type { UserDetails } from '@repo/mcp-common/src/durable-objects/user_details.do'
+import type { WorkersBindingsMCP } from './bindings.app'
+
+export interface Env {
+	OAUTH_KV: KVNamespace
+	MCP_COOKIE_ENCRYPTION_KEY: string
+	ENVIRONMENT: 'development' | 'staging' | 'production' | 'test'
+	MCP_SERVER_NAME: string
+	MCP_SERVER_VERSION: string
+	CLOUDFLARE_CLIENT_ID: string
+	CLOUDFLARE_CLIENT_SECRET: string
+	MCP_OBJECT: DurableObjectNamespace<WorkersBindingsMCP>
+	USER_DETAILS: DurableObjectNamespace<UserDetails>
+	MCP_METRICS: AnalyticsEngineDataset
+	CLOUDFLARE_API_TOKEN: string
+	OPENAI_API_KEY: string
+	AI_GATEWAY_TOKEN: string
+	CLOUDFLARE_ACCOUNT_ID: string
+	AI_GATEWAY_ID: string
+	AI: Ai
+	VECTORIZE: VectorizeIndex
+	DEV_DISABLE_OAUTH: string
+	DEV_CLOUDFLARE_API_TOKEN: string
+	DEV_CLOUDFLARE_EMAIL: string
+}
+
+
+
+================================================
+FILE: apps/workers-builds/package.json
+================================================
+{
+	"name": "workers-builds",
+	"version": "0.1.10",
+	"private": true,
+	"scripts": {
+		"check:lint": "run-eslint-workers",
+		"check:types": "run-tsc",
+		"deploy": "run-wrangler-deploy",
+		"dev": "vite dev",
+		"start": "vite dev",
+		"types": "wrangler types --include-env=false",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@cloudflare/workers-oauth-provider": "0.0.13",
+		"@hono/zod-validator": "0.4.3",
+		"@modelcontextprotocol/sdk": "1.20.2",
+		"@repo/mcp-common": "workspace:*",
+		"@repo/mcp-observability": "workspace:*",
+		"agents": "0.2.19",
+		"cloudflare": "4.2.0",
+		"hono": "4.7.6",
+		"zod": "3.24.2"
+	},
+	"devDependencies": {
+		"@cloudflare/vite-plugin": "1.1.0",
+		"@cloudflare/vitest-pool-workers": "0.8.14",
+		"@types/node": "22.14.1",
+		"prettier": "3.5.3",
+		"typescript": "5.5.4",
+		"vite": "6.3.4",
+		"vitest": "3.0.9",
+		"wrangler": "4.10.0"
+	}
+}
+
+
+
+================================================
+FILE: apps/workers-builds/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/workers.json",
+	"include": ["*/**.ts", "./vitest.config.ts", "./types.d.ts"]
+}
+
+
+
+================================================
+FILE: apps/workers-builds/types.d.ts
+================================================
+import type { TestEnv } from './vitest.config'
+
+declare module 'cloudflare:test' {
+	interface ProvidedEnv extends TestEnv {}
+}
+
+
+
+================================================
+FILE: apps/workers-builds/vite.config.mts
+================================================
+import { cloudflare } from '@cloudflare/vite-plugin'
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+	plugins: [cloudflare()],
+	server: {
+		port: 8976,
+	},
+})
+
+
+
+================================================
+FILE: apps/workers-builds/vitest.config.ts
+================================================
+import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
+
+import type { Env } from './src/workers-builds.context'
+
+export interface TestEnv extends Env {
+	CLOUDFLARE_MOCK_ACCOUNT_ID: string
+	CLOUDFLARE_MOCK_API_TOKEN: string
+}
+
+export default defineWorkersConfig({
+	test: {
+		poolOptions: {
+			workers: {
+				wrangler: { configPath: `${__dirname}/wrangler.jsonc` },
+				miniflare: {
+					bindings: {
+						CLOUDFLARE_MOCK_ACCOUNT_ID: 'mock-account-id',
+						CLOUDFLARE_MOCK_API_TOKEN: 'mock-api-token',
+					} satisfies Partial<TestEnv>,
+				},
+			},
+		},
+	},
+})
+
+
+
+================================================
+FILE: apps/workers-builds/.dev.vars.example
+================================================
+CLOUDFLARE_CLIENT_ID=
+CLOUDFLARE_CLIENT_SECRET=
+# OR
+DEV_DISABLE_OAUTH=
+DEV_CLOUDFLARE_API_TOKEN=
+
+
+
+
+================================================
+FILE: apps/workers-builds/.eslintrc.cjs
+================================================
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+	root: true,
+	extends: ['@repo/eslint-config/default.cjs'],
+}
+
+
+
+================================================
+FILE: apps/workers-builds/src/workers-builds.context.ts
+================================================
+import type { UserDetails } from '@repo/mcp-common/src/durable-objects/user_details.do'
+import type { BuildsMCP } from './workers-builds.app'
+
+export interface Env {
+	OAUTH_KV: KVNamespace
+	MCP_COOKIE_ENCRYPTION_KEY: string
+	ENVIRONMENT: 'development' | 'staging' | 'production'
+	MCP_SERVER_NAME: string
+	MCP_SERVER_VERSION: string
+	CLOUDFLARE_CLIENT_ID: string
+	CLOUDFLARE_CLIENT_SECRET: string
+	MCP_OBJECT: DurableObjectNamespace<BuildsMCP>
+	USER_DETAILS: DurableObjectNamespace<UserDetails>
+	MCP_METRICS: AnalyticsEngineDataset
+	SENTRY_ACCESS_CLIENT_ID: string
+	SENTRY_ACCESS_CLIENT_SECRET: string
+	GIT_HASH: string
+	SENTRY_DSN: string
+	DEV_DISABLE_OAUTH: string
+	DEV_CLOUDFLARE_API_TOKEN: string
+	DEV_CLOUDFLARE_EMAIL: string
+}
+
+
+
+================================================
+FILE: apps/workers-observability/package.json
+================================================
+{
+	"name": "workers-observability",
+	"version": "0.4.4",
+	"private": true,
+	"scripts": {
+		"check:lint": "run-eslint-workers",
+		"check:types": "run-tsc",
+		"deploy": "run-wrangler-deploy",
+		"dev": "wrangler dev",
+		"start": "wrangler dev",
+		"types": "wrangler types --include-env=false",
+		"test": "vitest run"
+	},
+	"dependencies": {
+		"@cloudflare/workers-oauth-provider": "0.0.13",
+		"@fast-csv/format": "5.0.2",
+		"@hono/zod-validator": "0.4.3",
+		"@modelcontextprotocol/sdk": "1.20.2",
+		"@repo/mcp-common": "workspace:*",
+		"@repo/mcp-observability": "workspace:*",
+		"agents": "0.2.19",
+		"cloudflare": "4.2.0",
+		"hono": "4.7.6",
+		"workers-tagged-logger": "0.13.5",
+		"zod": "3.24.2"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "0.8.14",
+		"@types/node": "22.14.1",
+		"prettier": "3.5.3",
+		"typescript": "5.5.4",
+		"vitest": "3.0.9",
+		"wrangler": "4.10.0"
+	}
+}
+
+
+
+================================================
+FILE: apps/workers-observability/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/workers.json",
+	"include": ["*/**.ts", "./vitest.config.ts", "./types.d.ts"]
+}
+
+
+
+================================================
+FILE: apps/workers-observability/types.d.ts
+================================================
+import type { TestEnv } from './vitest.config'
+
+declare module 'cloudflare:test' {
+	interface ProvidedEnv extends TestEnv {}
+}
+
+
+
+================================================
+FILE: apps/workers-observability/vitest.config.ts
+================================================
+import { defineWorkersConfig } from '@cloudflare/vitest-pool-workers/config'
+
+import type { Env } from './src/workers-observability.context'
+
+export interface TestEnv extends Env {
+	CLOUDFLARE_MOCK_ACCOUNT_ID: string
+	CLOUDFLARE_MOCK_API_TOKEN: string
+}
+
+export default defineWorkersConfig({
+	test: {
+		poolOptions: {
+			workers: {
+				wrangler: { configPath: `${__dirname}/wrangler.jsonc` },
+				miniflare: {
+					bindings: {
+						CLOUDFLARE_MOCK_ACCOUNT_ID: 'mock-account-id',
+						CLOUDFLARE_MOCK_API_TOKEN: 'mock-api-token',
+					} satisfies Partial<TestEnv>,
+				},
+			},
+		},
+	},
+})
+
+
+
+================================================
+FILE: apps/workers-observability/.dev.vars.example
+================================================
+CLOUDFLARE_CLIENT_ID=
+CLOUDFLARE_CLIENT_SECRET=
+DEV_DISABLE_OAUTH=
+DEV_CLOUDFLARE_API_TOKEN=
+
+
+
+
+================================================
+FILE: apps/workers-observability/.eslintrc.cjs
+================================================
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+	root: true,
+	extends: ['@repo/eslint-config/default.cjs'],
+}
+
+
+
+================================================
+FILE: apps/workers-observability/src/workers-observability.context.ts
+================================================
+import type { UserDetails } from '@repo/mcp-common/src/durable-objects/user_details.do'
+import type { ObservabilityMCP } from './workers-observability.app'
+
+export interface Env {
+	OAUTH_KV: KVNamespace
+	MCP_COOKIE_ENCRYPTION_KEY: string
+	ENVIRONMENT: 'development' | 'staging' | 'production'
+	MCP_SERVER_NAME: string
+	MCP_SERVER_VERSION: string
+	CLOUDFLARE_CLIENT_ID: string
+	CLOUDFLARE_CLIENT_SECRET: string
+	MCP_OBJECT: DurableObjectNamespace<ObservabilityMCP>
+	USER_DETAILS: DurableObjectNamespace<UserDetails>
+	MCP_METRICS: AnalyticsEngineDataset
+	SENTRY_ACCESS_CLIENT_ID: string
+	SENTRY_ACCESS_CLIENT_SECRET: string
+	GIT_HASH: string
+	SENTRY_DSN: string
+	AI: Ai
+	VECTORIZE: VectorizeIndex
+	DEV_DISABLE_OAUTH: string
+	DEV_CLOUDFLARE_API_TOKEN: string
+	DEV_CLOUDFLARE_EMAIL: string
+}
+
+
+
+================================================
+FILE: packages/eslint-config/README.md
+================================================
+# `@repo/eslint-config`
+
+Collection of internal eslint configurations.
+
+
+
+================================================
+FILE: packages/eslint-config/CHANGELOG.md
+================================================
+# @repo/eslint-config
+
+## 0.1.37
+
+### Patch Changes
+
+- 99e2282: Move docs MCP server to use AI Search
+
+## 0.1.36
+
+### Patch Changes
+
+- cc6d41f: Update agents deps & modelcontextprotocol
+
+
+
+================================================
+FILE: packages/eslint-config/package.json
+================================================
+{
+	"name": "@repo/eslint-config",
+	"version": "0.1.37",
+	"private": true,
+	"sideEffects": false,
+	"files": [
+		"remix.cjs",
+		"default.cjs"
+	],
+	"devDependencies": {
+		"@types/eslint": "8.56.10",
+		"@types/node": "22.14.1",
+		"@typescript-eslint/eslint-plugin": "7.18.0",
+		"@typescript-eslint/parser": "7.18.0",
+		"eslint": "8.57.0",
+		"eslint-config-prettier": "9.1.0",
+		"eslint-config-turbo": "2.4.2",
+		"eslint-import-resolver-typescript": "3.8.3",
+		"eslint-plugin-import": "2.31.0",
+		"eslint-plugin-only-warn": "1.1.0",
+		"eslint-plugin-unused-imports": "3.2.0",
+		"typescript": "5.5.4",
+		"vitest": "3.0.9"
+	}
+}
+
+
+
+================================================
+FILE: packages/eval-tools/CHANGELOG.md
+================================================
+# @repo/eval-tools
+
+## 0.32.5
+
+### Patch Changes
+
+- 99e2282: Move docs MCP server to use AI Search
+
+## 0.32.4
+
+### Patch Changes
+
+- 847fc1f: Update cloudflare-oauth-handler
+
+## 0.32.3
+
+### Patch Changes
+
+- 43f493d: Update agent + modelcontextprotocol deps
+
+## 0.32.2
+
+### Patch Changes
+
+- 24dd872: feat: Add MCP tool titles and hints to all Cloudflare tools
+
+## 0.32.1
+
+### Patch Changes
+
+- cc6d41f: Update agents deps & modelcontextprotocol
+
+## 0.32.0
+
+### Minor Changes
+
+- 6cf52a6: Support AOT tokens
+
+### Patch Changes
+
+- 0fc4439: Update agents and modelcontext dependencies
+
+
+
+================================================
+FILE: packages/eval-tools/package.json
+================================================
+{
+	"name": "@repo/eval-tools",
+	"version": "0.32.5",
+	"private": true,
+	"sideEffects": false,
+	"type": "module",
+	"scripts": {
+		"types": "wrangler types --include-env=false"
+	},
+	"directories": {
+		"bin": "bin"
+	},
+	"dependencies": {
+		"@ai-sdk/anthropic": "1.2.11",
+		"@ai-sdk/google": "1.2.17",
+		"@ai-sdk/openai": "1.3.20",
+		"@cloudflare/vitest-pool-workers": "0.8.14",
+		"agents": "0.2.19",
+		"ai": "4.3.10",
+		"ai-gateway-provider": "0.0.6",
+		"workers-ai-provider": "0.3.0",
+		"wrangler": "4.10.0",
+		"zod": "3.24.2"
+	},
+	"devDependencies": {
+		"@repo/typescript-config": "workspace:*",
+		"@types/node": "22.14.1",
+		"vitest-evals": "0.1.4"
+	}
+}
+
+
+
+================================================
+FILE: packages/eval-tools/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/workers.json",
+	"include": ["**/*.ts", "./worker-configuration.d.ts"],
+	"exclude": ["node_modules", "tsconfig.json"]
+}
+
+
+
+================================================
+FILE: packages/eval-tools/wrangler.json
+================================================
+{
+	"name": "stub-worker",
+	"compatibility_date": "2025-04-14",
+	"vars": {
+		"OPENAI_API_KEY": "TODO",
+		"AI_GATEWAY_TOKEN": "TODO",
+		"CLOUDFLARE_ACCOUNT_ID": "TODO",
+		"AI_GATEWAY_ID": "TODO"
+	},
+	"ai": {
+		"binding": "AI"
+	}
+}
+
+
+
+================================================
+FILE: packages/mcp-common/README.md
+================================================
+# MCP Common
+
+A place for common things used across MCP packages/apps
+
+
+
+================================================
+FILE: packages/mcp-common/package.json
+================================================
+{
+	"name": "@repo/mcp-common",
+	"version": "0.20.2",
+	"private": true,
+	"sideEffects": false,
+	"main": "./src/index.ts",
+	"scripts": {
+		"check:lint": "run-eslint-workers",
+		"check:types": "run-tsc",
+		"test": "vitest run",
+		"test:coverage": "run-vitest-coverage"
+	},
+	"dependencies": {
+		"@cloudflare/workers-oauth-provider": "0.0.13",
+		"@fast-csv/format": "5.0.2",
+		"@hono/zod-validator": "0.4.3",
+		"@modelcontextprotocol/sdk": "1.20.2",
+		"@repo/mcp-observability": "workspace:*",
+		"agents": "0.2.19",
+		"cloudflare": "4.2.0",
+		"hono": "4.7.6",
+		"toucan-js": "4.1.1",
+		"zod": "3.24.2"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "0.8.14",
+		"@repo/eslint-config": "workspace:*",
+		"@repo/tools": "workspace:*",
+		"@repo/typescript-config": "workspace:*",
+		"@sentry/types": "8.9.2",
+		"@types/node": "22.14.1",
+		"@vitest/ui": "3.0.9",
+		"vitest": "3.0.9",
+		"wrangler": "4.10.0"
+	}
+}
+
+
+
+================================================
+FILE: packages/mcp-common/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/workers-lib.json",
+	"include": ["**/*.ts"],
+	"exclude": ["node_modules", "tsconfig.json"],
+	"compilerOptions": {
+		"types": ["@cloudflare/vitest-pool-workers"]
+	}
+}
+
+
+
+================================================
+FILE: packages/mcp-common/types.d.ts
+================================================
+import type { TestEnv } from './vitest.config'
+
+declare module 'cloudflare:test' {
+	interface ProvidedEnv extends TestEnv {}
+}
+
+
+
+================================================
+FILE: packages/mcp-common/vitest.config.ts
+================================================
+import { defineWorkersProject } from '@cloudflare/vitest-pool-workers/config'
+
+export interface TestEnv {
+	CLOUDFLARE_MOCK_ACCOUNT_ID: string
+	CLOUDFLARE_MOCK_API_TOKEN: string
+}
+
+export default defineWorkersProject({
+	test: {
+		poolOptions: {
+			workers: {
+				singleWorker: true,
+				miniflare: {
+					compatibilityDate: '2025-03-10',
+					compatibilityFlags: ['nodejs_compat'],
+					bindings: {
+						CLOUDFLARE_MOCK_ACCOUNT_ID: 'mock-account-id',
+						CLOUDFLARE_MOCK_API_TOKEN: 'mock-api-token',
+					} satisfies Partial<TestEnv>,
+				},
+			},
+		},
+	},
+})
+
+
+
+================================================
+FILE: packages/mcp-common/.eslintrc.cjs
+================================================
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+	root: true,
+	extends: ['@repo/eslint-config/default.cjs'],
+}
+
+
+
+================================================
+FILE: packages/mcp-common/src/api-handler.ts
+================================================
+import type { McpAgent } from 'agents/mcp'
+
+// Support both SSE and Streamable HTTP
+export function createApiHandler<
+	T extends typeof McpAgent<unknown, unknown, Record<string, unknown>>,
+>(agent: T, opts?: { binding?: string }) {
+	return {
+		fetch: (req: Request, env: unknown, ctx: ExecutionContext) => {
+			const url = new URL(req.url)
+			if (url.pathname === '/sse' || url.pathname === '/sse/message') {
+				return agent.serveSSE('/sse', { binding: opts?.binding }).fetch(req, env, ctx)
+			}
+			if (url.pathname === '/mcp') {
+				return agent.serve('/mcp', { binding: opts?.binding }).fetch(req, env, ctx)
+			}
+			return new Response('Not found', { status: 404 })
+		},
+	}
+}
+
+
+
+================================================
+FILE: packages/mcp-common/src/config.ts
+================================================
+import { z } from 'zod'
+
+export type MCPEnvironment = z.infer<typeof MCPEnvironment>
+export const MCPEnvironment = z.enum(['VITEST', 'development', 'staging', 'production'])
+
+export function getEnvironment(environment: string) {
+	return MCPEnvironment.parse(environment)
+}
+
+
+
+================================================
+FILE: packages/mcp-common/src/constants.ts
+================================================
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js'
+
+export const MISSING_ACCOUNT_ID_RESPONSE = {
+	content: [
+		{
+			type: 'text',
+			text: 'No currently active accountId. Try listing your accounts (accounts_list) and then setting an active account (set_active_account)',
+		},
+	],
+} satisfies CallToolResult
+
+
+
+================================================
+FILE: packages/mcp-common/src/env.ts
+================================================
+import { env } from 'cloudflare:workers'
+
+// Helper to cast env as any generic Env type
+export function getEnv<Env>() {
+	return env as Env
+}
+
+
+
+================================================
+FILE: packages/mcp-common/src/format.ts
+================================================
+import { writeToString } from '@fast-csv/format'
+
+/**
+ * A collection of formatting functions (think of it like Golang's `fmt` package)
+ */
+export const fmt = {
+	/**
+	 * Trims all lines of a string.
+	 * Useful for formatting tool instructions.
+	 */
+	trim: (str: string): string =>
+		str
+			.trim()
+			.split('\n')
+			.map((line) => line.trim())
+			.join('\n'),
+
+	/**
+	 * Converts a multi-line string into a single line.
+	 * Useful for formatting tool instructions.
+	 */
+	oneLine: (str: string): string =>
+		str
+			.trim()
+			.split('\n')
+			.map((line) => line.trim())
+			.filter((line) => line.length > 0)
+			.join(' '),
+
+	/**
+	 * Convert an array of objects to a string of tab-separated values (TSV).
+	 * This is better than JSON for returning data to the model because it uses fewer tokens
+	 */
+	asTSV: (data: any[]): Promise<string> => writeToString(data, { headers: true, delimiter: '\t' }),
+} as const
+
+
+
+================================================
+FILE: packages/mcp-common/src/get-props.ts
+================================================
+/**
+ * Gets props from agent or throws if undefined
+ */
+export function getProps<T = unknown>(agent: { props?: T }): T {
+	if (!agent.props) {
+		throw new Error('Props required')
+	}
+	return agent.props
+}
+
+
+
+================================================
+FILE: packages/mcp-common/src/mcp-error.ts
+================================================
+import type { ContentfulStatusCode } from 'hono/utils/http-status'
+
+export class McpError extends Error {
+	public code: ContentfulStatusCode
+	public reportToSentry: boolean
+	// error message for internal use
+	public internalMessage?: string
+	public cause?: Error
+	constructor(
+		message: string,
+		code: ContentfulStatusCode,
+		opts: {
+			reportToSentry: boolean
+			internalMessage?: string
+			cause?: Error
+		} = { reportToSentry: false }
+	) {
+		super(message)
+		this.code = code
+		this.name = 'MCPError'
+		this.reportToSentry = opts.reportToSentry
+		this.internalMessage = opts.internalMessage
+		this.cause = opts.cause
+	}
+}
+
+
+
+================================================
+FILE: packages/mcp-common/src/poll.ts
+================================================
+type PollOptions<T> = {
+	taskFn: () => Promise<T>
+	checkFn?: (result: T) => boolean
+	intervalSeconds?: number
+	maxWaitSeconds?: number
+	onError?: (error: unknown) => void
+}
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+export async function pollUntilReady<T>({
+	taskFn,
+	checkFn = (result: T) => Boolean(result),
+	intervalSeconds = 5,
+	maxWaitSeconds = 60,
+	onError = () => {},
+}: PollOptions<T>): Promise<T> {
+	let elapsed = 0
+	let result: T | null = null
+
+	while (elapsed < maxWaitSeconds) {
+		try {
+			result = await taskFn()
+			if (checkFn(result)) break
+		} catch (error) {
+			onError(error)
+		}
+
+		await sleep(intervalSeconds * 1000)
+		elapsed += intervalSeconds
+	}
+
+	if (result === null || !checkFn(result)) {
+		throw new Error('Polling timed out or condition not met')
+	}
+
+	return result
+}
+
+
+
+================================================
+FILE: packages/mcp-common/src/scopes.ts
+================================================
+// These scopes are required for Cloudflare auth
+export const RequiredScopes = {
+	'user:read': 'See your user info such as name, email address, and account memberships.',
+	offline_access: 'Grants refresh tokens for long-lived access.',
+} as const
+
+
+
+================================================
+FILE: packages/mcp-common/src/prompts/docs-ai-search.prompts.ts
+================================================
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+
+/**
+ * Registers developer-platform-related prompts with the MCP server
+ * @param server The MCP server instance
+ */
+export function registerPrompts(server: McpServer) {
+	server.prompt(
+		'workers-prompt-full',
+		'Detailed prompt for generating Cloudflare Workers code (and other developer platform products) from https://developers.cloudflare.com/workers/prompt.txt',
+		async () => ({
+			messages: [
+				{
+					role: 'user',
+					content: {
+						type: 'text',
+						text: await (
+							await fetch('https://developers.cloudflare.com/workers/prompt.txt', {
+								cf: { cacheEverything: true, cacheTtl: 3600 },
+							})
+						).text(),
+					},
+				},
+			],
+		})
+	)
+}
+
+
+
+================================================
+FILE: packages/mcp-common/src/prompts/docs-vectorize.prompts.ts
+================================================
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+
+/**
+ * Registers developer-platform-related prompts with the MCP server
+ * @param server The MCP server instance
+ */
+export function registerPrompts(server: McpServer) {
+	server.prompt(
+		'workers-prompt-full',
+		'Detailed prompt for generating Cloudflare Workers code (and other developer platform products) from https://developers.cloudflare.com/workers/prompt.txt',
+		async () => ({
+			messages: [
+				{
+					role: 'user',
+					content: {
+						type: 'text',
+						text: await (
+							await fetch('https://developers.cloudflare.com/workers/prompt.txt', {
+								cf: { cacheEverything: true, cacheTtl: 3600 },
+							})
+						).text(),
+					},
+				},
+			],
+		})
+	)
+}
+
+
+
+================================================
+FILE: packages/mcp-common/src/types/cloudflare-mcp-agent.types.ts
+================================================
+import { type McpAgent } from 'agents/mcp'
+
+import type { AuthProps } from '../cloudflare-oauth-handler'
+import type { CloudflareMCPServer } from '../server'
+
+export type CloudflareMCPAgentState = { activeAccountId: string | null }
+
+export type CloudflareMCPAgentProps = AuthProps
+
+// We omit server in this type, so that we can later use our own CloudflareMCPServer type ( which extends McpServer )
+type McpAgentWithoutServer<EnvType = unknown> = Omit<
+	McpAgent<EnvType, CloudflareMCPAgentState, CloudflareMCPAgentProps>,
+	'server'
+>
+
+export interface CloudflareMcpAgentNoAccount<EnvType = unknown>
+	extends McpAgentWithoutServer<EnvType> {
+	server: CloudflareMCPServer
+}
+
+export interface CloudflareMcpAgent<EnvType = unknown>
+	extends CloudflareMcpAgentNoAccount<EnvType> {
+	setActiveAccountId(accountId: string): Promise<void>
+	getActiveAccountId(): Promise<string | null>
+}
+
+
+
+================================================
+FILE: packages/mcp-common/src/types/d1.types.ts
+================================================
+/**
+ * This file contains the validators for the d1 tools.
+ */
+import { z } from 'zod'
+
+import type { DatabaseCreateParams } from 'cloudflare/resources/d1.mjs'
+
+export const D1DatabaseNameParam: z.ZodType<DatabaseCreateParams['name']> = z.string()
+export const D1DatabasePrimaryLocationHintParam: z.ZodType<
+	DatabaseCreateParams['primary_location_hint']
+> = z.enum(['wnam', 'enam', 'weur', 'eeur', 'apac', 'oc']).optional()
+
+export const D1DatabaseQuerySqlParam = z.string()
+export const D1DatabaseQueryParamsParam = z.array(z.string()).optional()
+
+
+
+================================================
+FILE: packages/mcp-common/src/types/shared.types.ts
+================================================
+import { z } from 'zod'
+
+export const PaginationPerPageParam = z.number().nullable().optional()
+export const PaginationPageParam = z.number().nullable().optional()
+
+export const PaginationLimitParam = z.number().optional()
+export const PaginationOffsetParam = z.number().optional()
+
+
+
+================================================
+FILE: packages/mcp-common/src/types/tools.types.ts
+================================================
+import type { z } from 'zod'
+
+export type ToolHandler<T extends Record<string, any>> = (
+	params: T & { accountId: string | null; apiToken: string }
+) => Promise<any>
+
+export interface ToolDefinition<T extends Record<string, any>> {
+	name: string
+	description: string
+	params: Record<string, z.ZodType>
+	handler: ToolHandler<T>
+}
+
+
+
+================================================
+FILE: packages/mcp-common/src/types/workers.types.ts
+================================================
+import { z } from 'zod'
+
+export type WorkersService = z.infer<typeof WorkersService>
+export const WorkersService = z.object({
+	id: z.string(),
+	default_environment: z.object({
+		environment: z.string(),
+		script_tag: z.string(),
+		created_on: z.string(),
+		modified_on: z.string(),
+		script: z.object({
+			created_on: z.string(),
+			modified_on: z.string(),
+			id: z.string(),
+		}),
+	}),
+	created_on: z.string(),
+	modified_on: z.string(),
+})
+
+
+
+================================================
+FILE: packages/mcp-common/tests/utils/cloudflare-mock.ts
+================================================
+import { vi } from 'vitest'
+
+import type { Account } from 'cloudflare/resources/accounts/accounts.mjs'
+
+/**
+ * Creates a mocked implementation of the Cloudflare client
+ */
+export const cloudflareClientMockImplementation = () => {
+	return {
+		accounts: {
+			list: vi.fn(async () => {
+				return {
+					success: true,
+					result: [
+						{
+							id: 'mock-account-id',
+							name: 'mock-account-name',
+						},
+					] satisfies Account[],
+				}
+			}),
+		},
+	}
+}
+
+
+
+================================================
+FILE: packages/mcp-observability/CHANGELOG.md
+================================================
+# @repo/mcp-observability
+
+## 0.32.5
+
+### Patch Changes
+
+- 99e2282: Move docs MCP server to use AI Search
+
+## 0.32.4
+
+### Patch Changes
+
+- 847fc1f: Update cloudflare-oauth-handler
+
+## 0.32.3
+
+### Patch Changes
+
+- 43f493d: Update agent + modelcontextprotocol deps
+
+## 0.32.2
+
+### Patch Changes
+
+- 7422e71: Update MCP sdk
+
+## 0.32.1
+
+### Patch Changes
+
+- cc6d41f: Update agents deps & modelcontextprotocol
+
+## 0.32.0
+
+### Minor Changes
+
+- 6cf52a6: Support AOT tokens
+
+### Patch Changes
+
+- 0fc4439: Update agents and modelcontext dependencies
+
+
+
+================================================
+FILE: packages/mcp-observability/package.json
+================================================
+{
+	"name": "@repo/mcp-observability",
+	"version": "0.32.5",
+	"private": true,
+	"sideEffects": false,
+	"type": "module",
+	"main": "./src/index.ts",
+	"scripts": {
+		"types": "wrangler types --include-env=false"
+	},
+	"directories": {
+		"bin": "bin"
+	},
+	"dependencies": {
+		"@modelcontextprotocol/sdk": "1.20.2",
+		"wrangler": "4.10.0",
+		"zod": "3.24.2"
+	},
+	"devDependencies": {
+		"@repo/typescript-config": "workspace:*",
+		"@types/node": "22.14.1"
+	}
+}
+
+
+
+================================================
+FILE: packages/mcp-observability/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/workers.json",
+	"include": ["**/*.ts"],
+	"exclude": ["node_modules", "tsconfig.json"]
+}
+
+
+
+================================================
+FILE: packages/mcp-observability/src/index.ts
+================================================
+export * from './analytics-engine'
+export * from './metrics'
+
+
+
+================================================
+FILE: packages/tools/CHANGELOG.md
+================================================
+# @repo/tools
+
+## 0.33.2
+
+### Patch Changes
+
+- 99e2282: Move docs MCP server to use AI Search
+
+## 0.33.1
+
+### Patch Changes
+
+- cc6d41f: Update agents deps & modelcontextprotocol
+
+## 0.33.0
+
+### Minor Changes
+
+- 6cf52a6: Support AOT tokens
+
+### Patch Changes
+
+- 0fc4439: Update agents and modelcontext dependencies
+
+## 0.32.1
+
+### Patch Changes
+
+- 86c2e4f: Add API token passthrough auth
+
+## 0.32.0
+
+### Minor Changes
+
+- 33e0198: BANDA-899 feat: add runx deploy-published-workers script
+
+### Patch Changes
+
+- bdb5b89: chore: remove pnpx from wrangler deploy script
+
+  This is redundant because turbo and pnpm already add the bundled wrangler command to $PATH
+
+
+
+================================================
+FILE: packages/tools/package.json
+================================================
+{
+	"name": "@repo/tools",
+	"version": "0.33.2",
+	"private": true,
+	"sideEffects": false,
+	"type": "module",
+	"directories": {
+		"bin": "bin"
+	},
+	"devDependencies": {
+		"@types/fs-extra": "11.0.4",
+		"@types/node": "22.14.1",
+		"vitest": "3.0.9"
+	},
+	"dependencies": {
+		"@commander-js/extra-typings": "13.1.0",
+		"@jahands/cli-tools": "0.10.2",
+		"commander": "13.1.0",
+		"empathic": "1.1.0",
+		"tsx": "4.19.3",
+		"zod": "4.0.0-beta.20250505T195954",
+		"zx": "8.5.4"
+	}
+}
+
+
+
+================================================
+FILE: packages/tools/tsconfig.json
+================================================
+{
+	"extends": "@repo/typescript-config/tools.json",
+	"include": ["**/*.ts"],
+	"exclude": ["node_modules", "tsconfig.json"]
+}
+
+
+
+================================================
+FILE: packages/tools/vitest.config.ts
+================================================
+import { defineConfig } from 'vitest/config'
+
+export default defineConfig({
+	test: {
+		setupFiles: [`${__dirname}/src/test/setup.ts`],
+		environment: 'node',
+	},
+})
+
+
+
+================================================
+FILE: packages/tools/.eslintrc.cjs
+================================================
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+	root: true,
+	extends: ['@repo/eslint-config/default.cjs'],
+}
+
+
+
+================================================
+FILE: packages/tools/src/proc.ts
+================================================
+export function getOutcome(exitCode: number | null) {
+	if (exitCode === 0) {
+		return chalk.green('Success!')
+	} else {
+		return chalk.red(`Failed with code: ${exitCode}`)
+	}
+}
+
+
+
+================================================
+FILE: packages/tools/src/cmd/deploy-published-packages.ts
+================================================
+import { Command } from '@commander-js/extra-typings'
+import { validateArg } from '@jahands/cli-tools'
+import z from 'zod'
+
+import { getPublishedPackages } from '../changesets'
+
+export const deployPublishedWorkersCmd = new Command('deploy-published-workers')
+	.description(
+		'Deploy Cloudflare Workers (based on which packages changesets marked as published in the release)'
+	)
+	.requiredOption(
+		'-e, --env <staging|production>',
+		'The environment to deploy to',
+		validateArg(z.enum(['staging', 'production']))
+	)
+	.action(async ({ env }) => {
+		const publishedPackages = await getPublishedPackages()
+
+		// This technically includes all versioned packages (including non-Workers),
+		// but that's fine because only Workers include a `deploy` package.json script.
+		const filters = publishedPackages.flatMap((p) => ['-F', p.name]) satisfies string[]
+
+		await $({
+			verbose: true,
+		})`turbo deploy ${filters} -- --env ${env}`
+	})
+
+
+
+================================================
+FILE: packages/tools/src/test/setup.ts
+================================================
+// Ensure chalk doesn't add colors to output for consistent snapshots
+delete process.env.FORCE_COLOR
+
+// runx uses zx/globals imported in bin/runx.ts
+// This import ensures that tests work without
+// needing to import this manually.
+await import('zx/globals')
+
+
+
+================================================
+FILE: packages/tools/src/test/fixtures/changesets/empty/.gitkeep
+================================================
+[Empty file]
+
+
+================================================
+FILE: packages/tools/src/test/fixtures/changesets/invalid-json/published-packages.json
+================================================
+this is not valid json
+
+
+
+================================================
+FILE: packages/tools/src/test/fixtures/changesets/invalid-schema/published-packages.json
+================================================
+[
+	{
+		"name": "package-a",
+		"version": 123
+	}
+]
+
+
+
+================================================
+FILE: packages/tools/src/test/fixtures/changesets/valid/published-packages.json
+================================================
+[
+	{
+		"name": "package-a",
+		"version": "1.0.0"
+	},
+	{
+		"name": "package-b",
+		"version": "2.1.3"
+	}
+]
+
+
+
+================================================
+FILE: packages/typescript-config/CHANGELOG.md
+================================================
+# @repo/typescript-config
+
+## 0.3.2
+
+### Patch Changes
+
+- 99e2282: Move docs MCP server to use AI Search
+
+## 0.3.1
+
+### Patch Changes
+
+- cc6d41f: Update agents deps & modelcontextprotocol
+
+## 0.3.0
+
+### Minor Changes
+
+- 6cf52a6: Support AOT tokens
+
+### Patch Changes
+
+- 0fc4439: Update agents and modelcontext dependencies
+
+## 0.2.5
+
+### Patch Changes
+
+- bdb5b89: chore: remove publishConfig from typescript-config/package.json
+
+  This did nothing.
+
+
+
+================================================
+FILE: packages/typescript-config/package.json
+================================================
+{
+	"name": "@repo/typescript-config",
+	"version": "0.3.2",
+	"private": true,
+	"sideEffects": false,
+	"devDependencies": {
+		"@types/node": "22.14.1"
+	}
+}
+
+
+
+================================================
+FILE: packages/typescript-config/tools.json
+================================================
+{
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"display": "Default",
+	"compilerOptions": {
+		"target": "es2022",
+		"module": "es2022",
+		"composite": false,
+		"declaration": true,
+		"declarationMap": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"inlineSources": false,
+		"isolatedModules": true,
+		"moduleResolution": "node",
+		"noUnusedLocals": false,
+		"noUnusedParameters": false,
+		"preserveWatchOutput": true,
+		"skipLibCheck": true,
+		"strict": true,
+		"noEmit": true,
+		"experimentalDecorators": true
+	},
+	"exclude": ["node_modules"]
+}
+
+
+
+================================================
+FILE: packages/typescript-config/workers-lib.json
+================================================
+{
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"extends": "@repo/typescript-config/workers.json",
+	"include": ["${configDir}/**/*.ts", "${configDir}/**/*.tsx"],
+	"exclude": ["${configDir}/node_modules/", "${configDir}/dist/"],
+	"compilerOptions": {
+		"types": ["@cloudflare/vitest-pool-workers"]
+	}
+}
+
+
+
+================================================
+FILE: packages/typescript-config/workers.json
+================================================
+{
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"include": [
+		"${configDir}/worker-configuration.d.ts",
+		"${configDir}/env.d.ts",
+		"${configDir}/**/*.ts",
+		"${configDir}/**/*.tsx"
+	],
+	"exclude": ["${configDir}/node_modules/", "${configDir}/dist/"],
+	"compilerOptions": {
+		"target": "es2022",
+		"lib": ["es2022"],
+		"jsx": "react",
+		"module": "es2022",
+		"moduleResolution": "bundler",
+		"types": ["./worker-configuration.d.ts", "@cloudflare/vitest-pool-workers", "@types/node"],
+		"resolveJsonModule": true,
+		"allowJs": true,
+		"checkJs": false,
+		"noEmit": true,
+		"isolatedModules": true,
+		"allowSyntheticDefaultImports": true,
+		"forceConsistentCasingInFileNames": true,
+		"strict": true,
+		"skipLibCheck": true
+	}
+}
+
+
+
+================================================
+FILE: .changeset/README.md
+================================================
+# Changesets
+
+Hello and welcome! This folder has been automatically generated by `@changesets/cli`, a build tool that works
+with multi-package repos, or single-package repos to help you version and publish your code. You can
+find the full documentation for it [in our repository](https://github.com/changesets/changesets)
+
+We have a quick list of common questions to get you started engaging with this project in
+[our documentation](https://github.com/changesets/changesets/blob/main/docs/common-questions.md)
+
+
+
+================================================
+FILE: .changeset/config.json
+================================================
+{
+	"$schema": "https://unpkg.com/@changesets/config@3.0.0/schema.json",
+	"changelog": "@changesets/cli/changelog",
+	"commit": false,
+	"fixed": [],
+	"linked": [],
+	"access": "restricted",
+	"baseBranch": "main",
+	"updateInternalDependencies": "patch",
+	"ignore": [],
+	"privatePackages": {
+		"version": true,
+		"tag": true
+	}
+}
+
+
+
+================================================
+FILE: .github/actions/setup/action.yml
+================================================
+name: 'Setup Node.js Environment'
+description: 'Install pnpm, Node.js, and project dependencies'
+
+inputs:
+  node-version:
+    description: 'Node.js version to use'
+    required: false
+    default: '22'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install pnpm
+      # note: version is inferred from the packageManager field in package.json
+      uses: pnpm/action-setup@v4
+
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: 'pnpm'
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile --child-concurrency=10
+
+
+
+================================================
+FILE: .github/ISSUE_TEMPLATE/bug_report.md
+================================================
+---
+name: Bug report
+about: Create a report to help us improve
+title: ''
+labels: ''
+assignees: ''
+
+---
+
+**Client Information**
+ - LLM Client: [e.g. Claude Desktop, claude.ai, Cursor, VSCode]
+ - Client Config: [e.g. claude_desktop_config.json or screenshot of client configuration UI]
+ - Using MCP Remote?: Yes/No
+ - MCP Server: [e.g. https://observability.mcp.cloudflare.com, https://docs.mcp.cloudflare.com]
+ - Prompt: [if applicable, add the prompt used]
+
+**Describe the bug**
+A clear and concise description of what the bug is. Any error logs are helpful.
+
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Connect to MCP Server...
+2. Provide LLM prompt "..."
+4. See error...
+
+**Expected behavior**
+A clear and concise description of what you expected to happen.
+
+**Additional context**
+Add any other context about the problem here.
+
+
+
+================================================
+FILE: .github/workflows/branches.yml
+================================================
+name: Branches
+on:
+  push:
+    branches-ignore: ['main']
+
+env:
+  FORCE_COLOR: 1
+
+jobs:
+  test:
+    name: Test & Check
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        node-version: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Syncpack lint
+        run: pnpm check:deps
+      - name: Run linter
+        run: pnpm check:turbo
+      - name: Run linter (formatting)
+        run: pnpm check:format
+      - name: Run tests
+        run: pnpm test
+
+  build-workers:
+    name: Build Workers
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+
+      - name: Build Workers
+        run: pnpm turbo deploy -- -e staging --dry-run
+
+
+================================================
+FILE: .github/workflows/main.yml
+================================================
+name: Main
+
+on:
+  push:
+    branches: ['main']
+
+env:
+  FORCE_COLOR: 1
+
+jobs:
+  deploy-staging:
+    name: Deploy (staging)
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    timeout-minutes: 10
+    concurrency: ${{ github.workflow }}-deploy-staging
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+
+      # Run tests & checks before deploying
+      - name: Syncpack lint
+        run: pnpm check:deps
+      - name: Run linter
+        run: pnpm check:turbo
+      - name: Run linter (formatting)
+        run: pnpm check:format
+      - name: Run tests
+        run: pnpm test
+
+      - name: Deploy Workers (staging)
+        run: pnpm turbo deploy -- -e staging
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+
