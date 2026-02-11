@@ -1,8 +1,7 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
-import { requireAuth } from '../middleware/auth.js';
+import { requireAuth, isAdmin } from '../middleware/auth.js';
 import { analyticsLogger } from '../services/analytics-logger.js';
-import { config } from '../utils/config.js';
 import type { AnalyticsEventType, UserActivitySummary, UserDetail } from '../types/analytics.js';
 
 /**
@@ -25,22 +24,6 @@ const eventsQuerySchema = z.object({
   eventType: z.string().optional(),
   days: z.coerce.number().min(1).max(90).default(7),
 });
-
-/**
- * Check if user is an admin
- * Uses ADMIN_EMAILS if configured, otherwise falls back to ALLOWLIST_EMAILS
- */
-function isAdmin(email: string): boolean {
-  const normalizedEmail = email.toLowerCase().trim();
-
-  // If ADMIN_EMAILS is explicitly set, use it
-  if (config.ADMIN_EMAILS && config.ADMIN_EMAILS.length > 0) {
-    return config.ADMIN_EMAILS.includes(normalizedEmail);
-  }
-
-  // Otherwise, all allowlisted users are considered admins
-  return config.ALLOWLIST_EMAILS.includes(normalizedEmail);
-}
 
 /**
  * Require admin access helper

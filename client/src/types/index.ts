@@ -3,6 +3,7 @@
 export interface User {
   email: string;
   displayName?: string;
+  isAdmin: boolean;
 }
 
 export interface RepoInfo {

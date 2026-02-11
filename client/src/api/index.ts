@@ -259,4 +259,30 @@ export async function getUserDetail(userEmail: string, days?: number): Promise<U
   return request<UserDetail>(`/analytics/users/${encodeURIComponent(userEmail)}?${params}`);
 }
 
+// Admin Settings
+export interface AdminSettings {
+  allowlistEmails: string[];
+  adminEmails: string[];
+  updatedAt: string;
+  updatedBy?: string;
+}
+
+export async function getAdminSettings(): Promise<AdminSettings> {
+  return request<AdminSettings>('/admin/settings');
+}
+
+export async function updateAllowlistEmails(emails: string[]): Promise<{ success: boolean; emails: string[]; updatedAt: string }> {
+  return request('/admin/settings/allowlist', {
+    method: 'PUT',
+    body: JSON.stringify({ emails }),
+  });
+}
+
+export async function updateAdminEmails(emails: string[]): Promise<{ success: boolean; emails: string[]; updatedAt: string }> {
+  return request('/admin/settings/admin-emails', {
+    method: 'PUT',
+    body: JSON.stringify({ emails }),
+  });
+}
+
 export { ApiError };

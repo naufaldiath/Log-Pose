@@ -8,6 +8,7 @@ import { SearchPanel } from '@/components/SearchPanel';
 import { ResizablePanel } from '@/components/ResizablePanel';
 import { SessionManagerModal } from '@/components/SessionManagerModal';
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
+import { AdminPanel } from '@/components/AdminPanel';
 import {
   Menu,
   Search,
@@ -20,7 +21,8 @@ import {
   Terminal,
   Keyboard,
   Settings,
-  BarChart3
+  BarChart3,
+  Shield
 } from 'lucide-react';
 
 function ErrorBanner() {
@@ -79,7 +81,9 @@ function MainLayout() {
     isMobile,
     setSearchOpen,
     isSessionManagerOpen,
-    setSessionManagerOpen
+    setSessionManagerOpen,
+    isAdminPanelOpen,
+    setAdminPanelOpen
   } = useAppStore();
 
   // Mobile panel toggle state
@@ -202,13 +206,26 @@ function MainLayout() {
         )}
 
         {/* Analytics button - admin only */}
-        <button
-          onClick={() => setShowAnalytics(true)}
-          className="p-2 hover:bg-midnight-800 rounded text-midnight-300 hover:text-midnight-100"
-          title="Analytics Dashboard"
-        >
-          <BarChart3 size={20} />
-        </button>
+        {user?.isAdmin && (
+          <button
+            onClick={() => setShowAnalytics(true)}
+            className="p-2 hover:bg-midnight-800 rounded text-midnight-300 hover:text-midnight-100"
+            title="Analytics Dashboard"
+          >
+            <BarChart3 size={20} />
+          </button>
+        )}
+
+        {/* Admin Settings button - admin only */}
+        {user?.isAdmin && (
+          <button
+            onClick={() => setAdminPanelOpen(true)}
+            className="p-2 hover:bg-midnight-800 rounded text-midnight-300 hover:text-midnight-100"
+            title="Admin Settings"
+          >
+            <Shield size={20} />
+          </button>
+        )}
 
         {/* Manage Sessions button */}
         <button
@@ -285,6 +302,12 @@ function MainLayout() {
       {showAnalytics && (
         <AnalyticsDashboard onClose={() => setShowAnalytics(false)} />
       )}
+
+      {/* Admin Panel */}
+      <AdminPanel
+        isOpen={isAdminPanelOpen}
+        onClose={() => setAdminPanelOpen(false)}
+      />
     </div>
   );
 }

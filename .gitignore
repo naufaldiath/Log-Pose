@@ -36,3 +36,6 @@ temp/
 # Cloudflare credentials (keep safe!)
 *.json.backup
 credentials.json
+
+# Server data (settings, etc.)
+server/data/

@@ -18,7 +18,8 @@ type AuditEventType =
   | 'task_start'
   | 'task_end'
   | 'ws_connect'
-  | 'ws_disconnect';
+  | 'ws_disconnect'
+  | 'settings_updated';
 
 interface AuditEvent {
   timestamp: string;

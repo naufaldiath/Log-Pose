@@ -11,6 +11,8 @@ import { auditLogger } from '../services/audit-logger.js';
 import { analyticsLogger } from '../services/analytics-logger.js';
 import { PathSecurityError } from '../utils/path-safety.js';
 import { sessionManager } from '../services/claude-session.js';
+import { settingsManager } from '../services/settings.js';
+import { isAdmin } from '../middleware/auth.js';
 
 // Request schemas
 const repoIdSchema = z.object({
@@ -128,6 +130,7 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
     return {
       email: user.email,
       displayName: user.displayName,
+      isAdmin: isAdmin(user.email),
     };
   });
   
@@ -562,5 +565,101 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
     }));
 
     return { sessions: sessionsWithRepo };
+  });
+
+  // Admin Settings Routes
+
+  // GET /api/admin/settings - Get current settings (admin only)
+  fastify.get('/api/admin/settings', async (request, reply) => {
+    const user = requireAuth(request, reply);
+
+    if (!isAdmin(user.email)) {
+      return reply.status(403).send({
+        error: 'Forbidden',
+        message: 'Admin access required',
+      });
+    }
+
+    const settings = settingsManager.getSettings();
+    return {
+      allowlistEmails: settings.allowlistEmails,
+      adminEmails: settings.adminEmails,
+      updatedAt: settings.updatedAt,
+      updatedBy: settings.updatedBy,
+    };
+  });
+
+  // PUT /api/admin/settings/allowlist - Update allowlist (admin only)
+  fastify.put('/api/admin/settings/allowlist', async (request, reply) => {
+    const user = requireAuth(request, reply);
+
+    if (!isAdmin(user.email)) {
+      return reply.status(403).send({
+        error: 'Forbidden',
+        message: 'Admin access required',
+      });
+    }
+
+    const bodySchema = z.object({
+      emails: z.array(z.string().email()),
+    });
+
+    const body = bodySchema.parse(request.body);
+
+    try {
+      settingsManager.updateAllowlistEmails(body.emails, user.email);
+      auditLogger.log('settings_updated', user.email, {
+        type: 'allowlist',
+        emailCount: body.emails.length,
+      });
+      return {
+        success: true,
+        emails: settingsManager.getAllowlistEmails(),
+        updatedAt: new Date().toISOString(),
+      };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to update allowlist';
+      return reply.status(400).send({
+        error: 'Bad Request',
+        message,
+      });
+    }
+  });
+
+  // PUT /api/admin/settings/admin-emails - Update admin emails (admin only)
+  fastify.put('/api/admin/settings/admin-emails', async (request, reply) => {
+    const user = requireAuth(request, reply);
+
+    if (!isAdmin(user.email)) {
+      return reply.status(403).send({
+        error: 'Forbidden',
+        message: 'Admin access required',
+      });
+    }
+
+    const bodySchema = z.object({
+      emails: z.array(z.string().email()),
+    });
+
+    const body = bodySchema.parse(request.body);
+
+    try {
+      settingsManager.updateAdminEmails(body.emails, user.email);
+      auditLogger.log('settings_updated', user.email, {
+        type: 'admin_emails',
+        emailCount: body.emails.length,
+      });
+      return {
+        success: true,
+        emails: settingsManager.getAdminEmails(),
+        updatedAt: new Date().toISOString(),
+      };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to update admin emails';
+      return reply.status(400).send({
+        error: 'Bad Request',
+        message,
+      });
+    }
   });
 };

@@ -3,6 +3,7 @@ import fp from 'fastify-plugin';
 import { config } from '../utils/config.js';
 import type { AuthenticatedUser } from '../types/index.js';
 import * as jose from 'jose';
+import { settingsManager } from '../services/settings.js';
 
 // Extend FastifyRequest to include user
 declare module 'fastify' {
@@ -69,8 +70,14 @@ async function verifyCloudflareJWT(token: string): Promise<{ email: string; name
  * Checks if an email is in the allowlist
  */
 function isEmailAllowed(email: string): boolean {
-  const normalizedEmail = email.toLowerCase().trim();
-  return config.ALLOWLIST_EMAILS.includes(normalizedEmail);
+  return settingsManager.isEmailAllowed(email);
+}
+
+/**
+ * Checks if an email has admin privileges
+ */
+export function isAdmin(email: string): boolean {
+  return settingsManager.isAdmin(email);
 }
 
 /**
