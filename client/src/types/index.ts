@@ -83,6 +83,16 @@ export type ServerMessage =
 
 export type SessionState = 'starting' | 'running' | 'exited';
 
+// User session for session manager (cross-repo)
+export interface UserSession {
+  id: string;
+  repoId: string;
+  repoName: string;
+  name: string;
+  state: SessionState;
+  createdAt: string;
+}
+
 // UI State types
 export interface OpenFile {
   path: string;

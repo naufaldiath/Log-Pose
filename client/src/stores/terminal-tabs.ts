@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { TerminalTab, SessionState } from '@/types';
 import * as api from '@/api';
+import { ApiError } from '@/api';
 
 interface TerminalTabsState {
   // Tabs
@@ -10,6 +11,7 @@ interface TerminalTabsState {
   // Loading states
   isLoading: boolean;
   error: string | null;
+  errorCode: string | null;
 
   // Actions
   loadTabs: (repoId: string) => Promise<void>;
@@ -18,6 +20,7 @@ interface TerminalTabsState {
   renameTab: (sessionId: string, name: string) => Promise<void>;
   setActiveTab: (sessionId: string) => void;
   updateTabState: (sessionId: string, state: SessionState) => void;
+  clearError: () => void;
 
   // Getters
   getActiveTab: () => TerminalTab | null;
@@ -29,17 +32,17 @@ export const useTerminalTabsStore = create<TerminalTabsState>((set, get) => ({
   activeTabId: null,
   isLoading: false,
   error: null,
+  errorCode: null,
 
   // Actions
   loadTabs: async (repoId: string) => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null, errorCode: null, activeTabId: null });
     try {
       const { tabs } = await api.getSessions(repoId);
       set({ tabs, isLoading: false });
 
-      // If no active tab but tabs exist, set first as active
-      const { activeTabId } = get();
-      if (!activeTabId && tabs.length > 0) {
+      // If tabs exist, set first as active
+      if (tabs.length > 0) {
         set({ activeTabId: tabs[0].id });
       }
     } catch (error: any) {
@@ -48,7 +51,7 @@ export const useTerminalTabsStore = create<TerminalTabsState>((set, get) => ({
   },
 
   createTab: async (repoId: string, name?: string) => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null, errorCode: null });
     try {
       console.log('[terminal-tabs] Creating session for repo:', repoId);
       const tab = await api.createSession(repoId, name);
@@ -62,9 +65,28 @@ export const useTerminalTabsStore = create<TerminalTabsState>((set, get) => ({
       return tab;
     } catch (error: any) {
       console.error('[terminal-tabs] Failed to create session:', error);
-      set({ error: error.message, isLoading: false });
+      // Handle specific error codes with user-friendly messages
+      if (error instanceof ApiError && error.status === 429) {
+        set({
+          error: `Session limit reached: ${error.message}. Click the settings icon in the top bar to manage your sessions.`,
+          errorCode: 'MAX_SESSIONS',
+          isLoading: false,
+        });
+      } else if (error instanceof ApiError && error.status === 503) {
+        set({
+          error: `Server is at maximum capacity. Please try again later.`,
+          errorCode: 'SERVER_BUSY',
+          isLoading: false,
+        });
+      } else {
+        set({ error: error.message, isLoading: false });
+      }
       return null;
     }
+  },
+
+  clearError: () => {
+    set({ error: null, errorCode: null });
   },
 
   closeTab: async (sessionId: string) => {

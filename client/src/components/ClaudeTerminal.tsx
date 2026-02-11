@@ -29,6 +29,7 @@ export const ClaudeTerminal: React.FC<ClaudeTerminalProps> = ({ showMobileKeyBar
 
   const selectedRepo = useAppStore((state) => state.selectedRepo);
   const user = useAppStore((state) => state.user);
+  const setSessionManagerOpen = useAppStore((state) => state.setSessionManagerOpen);
 
   // Terminal tabs state
   const {
@@ -40,6 +41,9 @@ export const ClaudeTerminal: React.FC<ClaudeTerminalProps> = ({ showMobileKeyBar
     renameTab,
     setActiveTab,
     updateTabState,
+    error: storeError,
+    errorCode,
+    clearError,
   } = useTerminalTabsStore();
 
   const repoId = selectedRepo?.repoId;
@@ -441,9 +445,32 @@ export const ClaudeTerminal: React.FC<ClaudeTerminalProps> = ({ showMobileKeyBar
         </div>
       </div>
 
-      {error && (
-        <div className="terminal-error">
-          ⚠️ {error}
+      {/* Show storeError (API errors like max sessions) with priority over local error (WebSocket errors) */}
+      {(storeError || error) && (
+        <div className={`terminal-error ${errorCode === 'MAX_SESSIONS' ? 'is-actionable' : ''}`}>
+          <div className="terminal-error-content">
+            <span>⚠️ {storeError || error}</span>
+            {errorCode === 'MAX_SESSIONS' && (
+              <button
+                className="terminal-error-action"
+                onClick={() => setSessionManagerOpen(true)}
+              >
+                Manage Sessions
+              </button>
+            )}
+          </div>
+          {(storeError || error) && (
+            <button
+              className="terminal-error-close"
+              onClick={() => {
+                setError(null);
+                clearError();
+              }}
+              title="Dismiss"
+            >
+              ×
+            </button>
+          )}
         </div>
       )}
 

@@ -347,6 +347,26 @@ body {
   @apply p-1.5 rounded hover:bg-midnight-700 text-midnight-400 hover:text-midnight-200 transition-colors;
 }
 
+.terminal-error {
+  @apply relative px-3 py-2 bg-red-950 border-b border-red-800 text-red-200;
+}
+
+.terminal-error-content {
+  @apply flex items-center justify-between gap-3 pr-6;
+}
+
+.terminal-error.is-actionable .terminal-error-content {
+  @apply flex-col items-start;
+}
+
+.terminal-error-action {
+  @apply px-3 py-1.5 text-xs font-medium bg-red-800 hover:bg-red-700 text-red-100 rounded transition-colors whitespace-nowrap;
+}
+
+.terminal-error-close {
+  @apply absolute top-1.5 right-2 px-1.5 py-0.5 text-red-400 hover:text-red-200 hover:bg-red-900 rounded text-lg leading-none;
+}
+
 /* Resizable Panel Styles */
 .resizable-panel {
   @apply relative flex;

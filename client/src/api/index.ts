@@ -1,4 +1,4 @@
-import type { User, RepoInfo, TreeResponse, FileResponse, SearchResponse, GitStatus, GitCommit, TerminalTab } from '@/types';
+import type { User, RepoInfo, TreeResponse, FileResponse, SearchResponse, GitStatus, GitCommit, TerminalTab, UserSession } from '@/types';
 
 const API_BASE = '/api';
 
@@ -15,9 +15,13 @@ class ApiError extends Error {
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
     ...(options?.headers as Record<string, string>),
   };
+
+  // Only add Content-Type if there's a body (not for DELETE requests, etc.)
+  if (options?.body) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   // Add dev email header in development mode
   if (DEV_EMAIL) {
@@ -158,6 +162,10 @@ export async function renameSession(sessionId: string, name: string): Promise<{ 
     method: 'PATCH',
     body: JSON.stringify({ name }),
   });
+}
+
+export async function getAllUserSessions(): Promise<{ sessions: UserSession[] }> {
+  return request<{ sessions: UserSession[] }>('/sessions/all');
 }
 
 export { ApiError };

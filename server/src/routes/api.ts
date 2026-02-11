@@ -298,19 +298,39 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
     }).parse(request.body);
 
     const repoPath = await getRepoPath(body.repoId);
-    const session = await sessionManager.createSession(
-      user.email,
-      body.repoId,
-      repoPath,
-      body.name
-    );
 
-    return {
-      id: session.id,
-      name: session.name,
-      state: session.state,
-      createdAt: session.createdAt,
-    };
+    try {
+      const session = await sessionManager.createSession(
+        user.email,
+        body.repoId,
+        repoPath,
+        body.name
+      );
+
+      return {
+        id: session.id,
+        name: session.name,
+        state: session.state,
+        createdAt: session.createdAt,
+      };
+    } catch (error: any) {
+      // Handle session limit errors with clear status codes
+      if (error.message?.includes('Maximum sessions per user reached')) {
+        return reply.status(429).send({
+          error: 'Session Limit Reached',
+          message: error.message,
+          code: 'MAX_SESSIONS_PER_USER',
+        });
+      }
+      if (error.message?.includes('Server at maximum capacity')) {
+        return reply.status(503).send({
+          error: 'Server Busy',
+          message: error.message,
+          code: 'SERVER_MAX_CAPACITY',
+        });
+      }
+      throw error;
+    }
   });
 
   // DELETE /api/sessions/:sessionId - Delete a session
@@ -344,5 +364,27 @@ export const apiRoutes: FastifyPluginAsync = async (fastify) => {
 
     const success = sessionManager.renameSession(sessionId, body.name);
     return { ok: success };
+  });
+
+  // GET /api/sessions/all - Get all sessions for current user across all repos
+  fastify.get('/api/sessions/all', async (request, reply) => {
+    const user = requireAuth(request, reply);
+
+    const sessions = sessionManager.getUserSessions(user.email);
+
+    // Get repo names for each session
+    const repos = await discoverRepos();
+    const repoMap = new Map(repos.map(r => [r.repoId, r.name]));
+
+    const sessionsWithRepo = sessions.map(session => ({
+      id: session.id,
+      repoId: session.repoId,
+      repoName: repoMap.get(session.repoId) || session.repoId,
+      name: session.name,
+      state: session.state,
+      createdAt: session.createdAt,
+    }));
+
+    return { sessions: sessionsWithRepo };
   });
 };

@@ -59,6 +59,7 @@ interface AppState {
   isSidebarOpen: boolean;
   isSearchOpen: boolean;
   isMobile: boolean;
+  isSessionManagerOpen: boolean;
 
   // Actions
   loadUser: () => Promise<void>;
@@ -78,6 +79,7 @@ interface AppState {
 
   toggleSidebar: () => void;
   setSearchOpen: (open: boolean) => void;
+  setSessionManagerOpen: (open: boolean) => void;
   setMobile: (isMobile: boolean) => void;
   setError: (error: string | null) => void;
 
@@ -109,6 +111,7 @@ export const useAppStore = create<AppState>((set, get) => {
     isSidebarOpen: persisted.isSidebarOpen ?? true,
     isSearchOpen: false,
     isMobile: false,
+    isSessionManagerOpen: false,
 
     // Actions
     loadUser: async () => {
@@ -311,6 +314,10 @@ export const useAppStore = create<AppState>((set, get) => {
 
     setSearchOpen: (open) => {
       set({ isSearchOpen: open });
+    },
+
+    setSessionManagerOpen: (open: boolean) => {
+      set({ isSessionManagerOpen: open });
     },
 
     setMobile: (isMobile) => {

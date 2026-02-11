@@ -6,6 +6,7 @@ import { CodeEditor } from '@/components/CodeEditor';
 import { ClaudeTerminal } from '@/components/ClaudeTerminal';
 import { SearchPanel } from '@/components/SearchPanel';
 import { ResizablePanel } from '@/components/ResizablePanel';
+import { SessionManagerModal } from '@/components/SessionManagerModal';
 import {
   Menu,
   Search,
@@ -16,7 +17,8 @@ import {
   Loader2,
   FileCode,
   Terminal,
-  Keyboard
+  Keyboard,
+  Settings
 } from 'lucide-react';
 
 function ErrorBanner() {
@@ -73,7 +75,9 @@ function MainLayout() {
     isSidebarOpen,
     toggleSidebar,
     isMobile,
-    setSearchOpen
+    setSearchOpen,
+    isSessionManagerOpen,
+    setSessionManagerOpen
   } = useAppStore();
 
   // Mobile panel toggle state
@@ -193,6 +197,15 @@ function MainLayout() {
           </button>
         )}
 
+        {/* Manage Sessions button */}
+        <button
+          onClick={() => setSessionManagerOpen(true)}
+          className="p-2 hover:bg-midnight-800 rounded text-midnight-300 hover:text-midnight-100"
+          title="Manage Sessions"
+        >
+          <Settings size={20} />
+        </button>
+
         {/* User info - hidden on mobile */}
         <div className="text-sm text-midnight-400 hidden md:block truncate max-w-[150px]">
           {user?.email}
@@ -248,6 +261,12 @@ function MainLayout() {
 
       {/* Search panel */}
       <SearchPanel />
+
+      {/* Session Manager Modal */}
+      <SessionManagerModal
+        isOpen={isSessionManagerOpen}
+        onClose={() => setSessionManagerOpen(false)}
+      />
     </div>
   );
 }
