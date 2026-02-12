@@ -91,6 +91,10 @@ export const wsRoutes: FastifyPluginAsync = async (fastify) => {
     // Track current session
     let currentSessionId: string | null = null;
 
+    // Buffer for accumulating terminal input to detect complete prompts
+    // xterm.js sends data per keystroke, so we need to buffer and detect Enter key
+    const inputBuffers = new Map<string, string>(); // clientId -> buffered input
+
     // Handle messages
     socket.on('message', async (data: Buffer | string) => {
       isAlive = true;
@@ -178,6 +182,50 @@ export const wsRoutes: FastifyPluginAsync = async (fastify) => {
 
             if (!success) {
               sendMessage(socket, { type: 'error', message: 'Session not running' });
+            }
+
+            // Buffer input to detect complete prompts when user presses Enter
+            // xterm.js sends data per keystroke, so we accumulate and check for Enter
+            if (!inputBuffers.has(clientId)) {
+              inputBuffers.set(clientId, '');
+            }
+
+            const buffer = inputBuffers.get(clientId)!;
+
+            // Check if this is an Enter key (carriage return or line feed)
+            if (message.data === '\r' || message.data === '\n') {
+              // User pressed Enter - log the complete buffered prompt
+              const cleanInput = buffer.trim();
+
+              // Only log if it looks like a natural language prompt (not shell commands)
+              // Heuristic: longer than 10 chars, contains spaces, and doesn't start with common shell chars
+              if (cleanInput.length > 10 && cleanInput.includes(' ')) {
+                const firstChar = cleanInput[0];
+                const isLikelyCommand = ['/', '-', '.', '!', '$', '#', '@', '%', '&', '*', '(', ')', '[', ']', '{', '}', '<', '>', ';', '|', '`'].includes(firstChar);
+
+                if (!isLikelyCommand) {
+                  const isQuestion = /\?|\b(how|what|why|when|where|who|can|could|would|will|explain|describe|tell|show|help|fix|refactor|improve|optimize|convert|translate|create|make|build|add|implement|write)\b/i.test(cleanInput);
+                  const hasCodeReference = /```|`[^`]+`|\b(function|class|const|let|var|if|for|while|return|import|export|async|await)\b/.test(cleanInput);
+
+                  analyticsLogger.logTerminalPrompt(user.email, repoId, cleanInput, isQuestion, hasCodeReference);
+                }
+              }
+
+              // Clear buffer after Enter
+              inputBuffers.set(clientId, '');
+            } else if (message.data === '\u007f' || message.data === '\b') {
+              // Handle backspace - remove last character from buffer
+              const currentBuffer = inputBuffers.get(clientId) || '';
+              inputBuffers.set(clientId, currentBuffer.slice(0, -1));
+            } else if (message.data === '\u0003') {
+              // Handle Ctrl+C - clear buffer
+              inputBuffers.set(clientId, '');
+            } else {
+              // Regular character - append to buffer (filter out control characters except Enter)
+              // Only append printable characters
+              if (message.data.length > 0 && message.data.charCodeAt(0) >= 32) {
+                inputBuffers.set(clientId, buffer + message.data);
+              }
             }
             break;
           }

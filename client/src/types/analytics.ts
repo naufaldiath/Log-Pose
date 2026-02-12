@@ -198,3 +198,23 @@ export interface UsersResponse {
   count: number;
   users: UserActivitySummary[];
 }
+
+// Popular prompts analytics
+export interface PopularPrompt {
+  prompt: string;
+  count: number;
+  uniqueUsers: number;
+  isQuestion: boolean;
+  category: 'code' | 'question' | 'command' | 'other';
+}
+
+export interface PopularPromptsResponse {
+  period: {
+    days: number;
+    startDate: string;
+    endDate: string;
+  };
+  totalPrompts: number;
+  uniquePrompts: number;
+  prompts: PopularPrompt[];
+}

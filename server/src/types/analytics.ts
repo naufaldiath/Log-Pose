@@ -29,6 +29,7 @@ export type AnalyticsEventType =
   | 'terminal_max_sessions'
   | 'mobile_keybar_used'
   | 'terminal_font_size_changed'
+  | 'terminal_prompt_submitted'
   // Search Usage
   | 'search_opened'
   | 'search_performed'
@@ -130,6 +131,14 @@ export interface MobileKeybarUsedEvent {
   keyType: 'esc' | 'tab' | 'ctrl' | 'alt' | 'up' | 'down' | 'left' | 'right' | 'enter' | 'slash';
 }
 
+export interface TerminalPromptSubmittedEvent {
+  repoId: string;
+  prompt: string;
+  promptLength: number;
+  isQuestion: boolean;
+  hasCodeReference: boolean;
+}
+
 // Search usage events
 export interface SearchPerformedEvent {
   repoId: string;
@@ -216,6 +225,26 @@ export interface PerformanceMetrics {
   p95ApiResponseTime: number;
   avgFileLoadTime: number;
   p95FileLoadTime: number;
+}
+
+// Popular prompts analytics
+export interface PopularPrompt {
+  prompt: string;
+  count: number;
+  uniqueUsers: number;
+  isQuestion: boolean;
+  category: 'code' | 'question' | 'command' | 'other';
+}
+
+export interface PopularPromptsResponse {
+  period: {
+    days: number;
+    startDate: string;
+    endDate: string;
+  };
+  totalPrompts: number;
+  uniquePrompts: number;
+  prompts: PopularPrompt[];
 }
 
 // User-level analytics types

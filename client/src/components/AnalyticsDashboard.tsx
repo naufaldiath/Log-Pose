@@ -2,13 +2,13 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   getAnalyticsSummary,
   getFeatureAdoption,
-  getPerformanceMetrics,
   getTopRepos,
   getAnalyticsErrors,
   getAnalyticsTimeSeries,
   checkAnalyticsAccess,
   getUsersActivity,
   getUserDetail,
+  getPopularPrompts,
   type ApiError,
 } from '@/api';
 import {
@@ -16,13 +16,11 @@ import {
   Activity,
   Terminal,
   Search,
-  Smartphone,
   GitBranch,
   Play,
   AlertCircle,
   X,
-  Zap,
-  Database,
+  MessageSquare,
   RefreshCw,
   ArrowLeft,
   User,
@@ -32,13 +30,13 @@ import {
 import type {
   AnalyticsSummaryResponse,
   FeatureAdoptionResponse,
-  PerformanceMetricsResponse,
   TopReposResponse,
   ErrorsResponse,
   TimeSeriesResponse,
   UsersResponse,
   UserDetail,
   UserActivitySummary,
+  PopularPromptsResponse,
 } from '@/types/analytics';
 
 interface AnalyticsDashboardProps {
@@ -455,10 +453,10 @@ export function AnalyticsDashboard({ onClose }: AnalyticsDashboardProps) {
 
   const [summary, setSummary] = useState<AnalyticsSummaryResponse | null>(null);
   const [featureAdoption, setFeatureAdoption] = useState<FeatureAdoptionResponse | null>(null);
-  const [performance, setPerformance] = useState<PerformanceMetricsResponse | null>(null);
   const [topRepos, setTopRepos] = useState<TopReposResponse | null>(null);
   const [errors, setErrors] = useState<ErrorsResponse | null>(null);
   const [timeSeries, setTimeSeries] = useState<TimeSeriesResponse | null>(null);
+  const [popularPrompts, setPopularPrompts] = useState<PopularPromptsResponse | null>(null);
 
   const checkAccess = useCallback(async () => {
     try {
@@ -488,28 +486,28 @@ export function AnalyticsDashboard({ onClose }: AnalyticsDashboardProps) {
       const [
         summaryRes,
         featureRes,
-        perfRes,
         reposRes,
         errorsRes,
         timeSeriesRes,
+        promptsRes,
       ] = await Promise.all([
         getAnalyticsSummary(days),
         getFeatureAdoption(days),
-        getPerformanceMetrics(days),
         getTopRepos(days),
         getAnalyticsErrors(days),
         getAnalyticsTimeSeries(
           ['api_request', 'file_opened', 'terminal_connected', 'search_performed'],
           days
         ),
+        getPopularPrompts(days),
       ]);
 
       setSummary(summaryRes);
       setFeatureAdoption(featureRes);
-      setPerformance(perfRes);
       setTopRepos(reposRes);
       setErrors(errorsRes);
       setTimeSeries(timeSeriesRes);
+      setPopularPrompts(promptsRes);
     } catch (err) {
       const apiError = err as ApiError;
       if (apiError.status === 403) {
@@ -615,7 +613,7 @@ export function AnalyticsDashboard({ onClose }: AnalyticsDashboardProps) {
           {activeTab === 'overview' && (
             <div className="space-y-6">
               {/* Key Metrics */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <MetricCard
                   title="Total Events"
                   value={summary?.summary.totalEvents.toLocaleString() ?? '-'}
@@ -629,24 +627,10 @@ export function AnalyticsDashboard({ onClose }: AnalyticsDashboardProps) {
                   icon={Users}
                 />
                 <MetricCard
-                  title="Avg API Response"
-                  value={performance?.metrics.avgApiResponseTime
-                    ? `${Math.round(performance.metrics.avgApiResponseTime)}ms`
-                    : '-'}
-                  subtitle={`P95: ${performance?.metrics.p95ApiResponseTime
-                    ? `${Math.round(performance.metrics.p95ApiResponseTime)}ms`
-                    : '-'}`}
-                  icon={Zap}
-                />
-                <MetricCard
-                  title="Avg File Load"
-                  value={performance?.metrics.avgFileLoadTime
-                    ? `${Math.round(performance.metrics.avgFileLoadTime)}ms`
-                    : '-'}
-                  subtitle={`P95: ${performance?.metrics.p95FileLoadTime
-                    ? `${Math.round(performance.metrics.p95FileLoadTime)}ms`
-                    : '-'}`}
-                  icon={Database}
+                  title="Terminal Prompts"
+                  value={popularPrompts?.totalPrompts.toLocaleString() ?? '-'}
+                  subtitle={`${popularPrompts?.uniquePrompts ?? '-'} unique questions asked`}
+                  icon={MessageSquare}
                 />
               </div>
 
@@ -655,9 +639,56 @@ export function AnalyticsDashboard({ onClose }: AnalyticsDashboardProps) {
                 <LineChart data={timeSeries?.data ?? []} />
               </Section>
 
+              {/* Popular Prompts */}
+              <Section title="Popular Prompts" loading={loading && !popularPrompts}>
+                {popularPrompts && popularPrompts.prompts.length > 0 ? (
+                  <div className="space-y-3">
+                    {popularPrompts.prompts.map((prompt, idx) => (
+                      <div key={idx} className="flex items-start gap-3 p-3 bg-midnight-800 rounded-lg">
+                        <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-midnight-700 rounded-full text-brass-500 font-bold text-sm">
+                          {idx + 1}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-midnight-100 text-sm truncate" title={prompt.prompt}>
+                            {prompt.prompt.length > 100 ? prompt.prompt.slice(0, 100) + '...' : prompt.prompt}
+                          </p>
+                          <div className="flex items-center gap-3 mt-2">
+                            <span className="text-xs text-midnight-400">
+                              {prompt.count} {prompt.count === 1 ? 'time' : 'times'}
+                            </span>
+                            <span className="text-xs text-midnight-500">
+                              {prompt.uniqueUsers} {prompt.uniqueUsers === 1 ? 'user' : 'users'}
+                            </span>
+                            {prompt.isQuestion && (
+                              <span className="px-2 py-0.5 bg-brass-900/30 text-brass-400 text-xs rounded-full">
+                                question
+                              </span>
+                            )}
+                            <span className={`px-2 py-0.5 text-xs rounded-full ${
+                              prompt.category === 'code' ? 'bg-blue-900/30 text-blue-400' :
+                              prompt.category === 'command' ? 'bg-green-900/30 text-green-400' :
+                              prompt.category === 'question' ? 'bg-purple-900/30 text-purple-400' :
+                              'bg-midnight-600 text-midnight-300'
+                            }`}>
+                              {prompt.category}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-midnight-400">
+                    <MessageSquare size={48} className="mx-auto mb-4 opacity-50" />
+                    <p>No prompts recorded yet</p>
+                    <p className="text-sm mt-2">Prompts will appear here when users interact with the terminal</p>
+                  </div>
+                )}
+              </Section>
+
               {/* Feature Adoption */}
               <Section title="Feature Adoption" loading={loading && !featureAdoption}>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {featureAdoption && (
                     <>
                       <div className="text-center p-4 bg-midnight-800 rounded-lg">
@@ -673,13 +704,6 @@ export function AnalyticsDashboard({ onClose }: AnalyticsDashboardProps) {
                           {featureAdoption.metrics.searchUsers}
                         </p>
                         <p className="text-midnight-400 text-sm">Search Users</p>
-                      </div>
-                      <div className="text-center p-4 bg-midnight-800 rounded-lg">
-                        <Smartphone size={24} className="mx-auto mb-2 text-brass-500" />
-                        <p className="text-2xl font-bold text-midnight-100">
-                          {featureAdoption.metrics.mobileUsers}
-                        </p>
-                        <p className="text-midnight-400 text-sm">Mobile Users</p>
                       </div>
                       <div className="text-center p-4 bg-midnight-800 rounded-lg">
                         <GitBranch size={24} className="mx-auto mb-2 text-brass-500" />

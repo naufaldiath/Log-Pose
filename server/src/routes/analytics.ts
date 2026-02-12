@@ -240,6 +240,16 @@ export const analyticsRoutes: FastifyPluginAsync = async (fastify) => {
     };
   });
 
+  // GET /api/analytics/popular-prompts - Get most common prompts submitted to terminal
+  fastify.get('/api/analytics/popular-prompts', async (request, reply) => {
+    requireAdmin(request, reply);
+
+    const query = summaryQuerySchema.parse(request.query);
+    const prompts = await analyticsLogger.getPopularPrompts(query.days, 20);
+
+    return prompts;
+  });
+
   // GET /api/analytics/errors - Get error summary
   fastify.get('/api/analytics/errors', async (request, reply) => {
     requireAdmin(request, reply);

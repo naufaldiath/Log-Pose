@@ -9,7 +9,8 @@ import type {
   EventsResponse,
   AnalyticsEventType,
   UsersResponse,
-  UserDetail
+  UserDetail,
+  PopularPromptsResponse
 } from '@/types/analytics';
 
 const API_BASE = '/api';
@@ -230,6 +231,12 @@ export async function getAnalyticsErrors(days?: number): Promise<ErrorsResponse>
   const params = new URLSearchParams();
   if (days) params.set('days', String(days));
   return request<ErrorsResponse>(`/analytics/errors?${params}`);
+}
+
+export async function getPopularPrompts(days?: number): Promise<PopularPromptsResponse> {
+  const params = new URLSearchParams();
+  if (days) params.set('days', String(days));
+  return request<PopularPromptsResponse>(`/analytics/popular-prompts?${params}`);
 }
 
 export async function getAnalyticsEvents(

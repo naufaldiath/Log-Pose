@@ -323,6 +323,26 @@ class AnalyticsLogger {
   }
 
   /**
+   * Logs a terminal prompt submission
+   * Tracks what users are asking Claude
+   */
+  logTerminalPrompt(
+    userEmail: string,
+    repoId: string,
+    prompt: string,
+    isQuestion: boolean,
+    hasCodeReference: boolean
+  ): void {
+    this.log('terminal_prompt_submitted', userEmail, {
+      repoId,
+      prompt,
+      promptLength: prompt.length,
+      isQuestion,
+      hasCodeReference,
+    });
+  }
+
+  /**
    * Logs a task started event
    */
   logTaskStarted(userEmail: string, repoId: string, taskId: string, runId: string): void {
@@ -655,6 +675,105 @@ class AnalyticsLogger {
       p95ApiResponseTime: Math.round(p95(apiTimes)),
       avgFileLoadTime: Math.round(avg(fileLoadTimes)),
       p95FileLoadTime: Math.round(p95(fileLoadTimes)),
+    };
+  }
+
+  /**
+   * Gets popular prompts from terminal input
+   * Analyzes what users are asking Claude
+   */
+  async getPopularPrompts(days: number = 30, limit: number = 20): Promise<{
+    period: { days: number; startDate: string; endDate: string };
+    totalPrompts: number;
+    uniquePrompts: number;
+    prompts: Array<{
+      prompt: string;
+      count: number;
+      uniqueUsers: number;
+      isQuestion: boolean;
+      category: 'code' | 'question' | 'command' | 'other';
+    }>;
+  }> {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    const events = await this.queryEvents({
+      startDate,
+      endDate,
+      eventTypes: ['terminal_prompt_submitted'],
+    });
+
+    // Aggregate prompts
+    const promptStats: Record<
+      string,
+      {
+        prompt: string;
+        count: number;
+        users: Set<string>;
+        isQuestion: boolean;
+      }
+    > = {};
+
+    for (const event of events) {
+      const prompt = event.properties.prompt as string;
+      const userId = event.userId;
+      const isQuestion = event.properties.isQuestion as boolean;
+
+      if (!prompt || prompt.length < 3) continue; // Skip very short inputs
+
+      // Normalize prompt for grouping (lowercase, trim)
+      const normalizedPrompt = prompt.toLowerCase().trim();
+
+      if (!promptStats[normalizedPrompt]) {
+        promptStats[normalizedPrompt] = {
+          prompt: prompt.trim(),
+          count: 0,
+          users: new Set(),
+          isQuestion: isQuestion ?? false,
+        };
+      }
+
+      promptStats[normalizedPrompt].count++;
+      promptStats[normalizedPrompt].users.add(userId);
+    }
+
+    // Categorize and format prompts
+    const categorizePrompt = (prompt: string): 'code' | 'question' | 'command' | 'other' => {
+      const lower = prompt.toLowerCase();
+      if (lower.includes('?') || lower.startsWith('how') || lower.startsWith('what') || lower.startsWith('why') || lower.startsWith('can you') || lower.startsWith('explain')) {
+        return 'question';
+      }
+      if (lower.startsWith('/')) {
+        return 'command';
+      }
+      if (lower.includes('```') || lower.includes('function') || lower.includes('class') || lower.includes('const') || lower.includes('let') || lower.includes('var')) {
+        return 'code';
+      }
+      return 'other';
+    };
+
+    // Convert to array, calculate unique users, sort by count
+    const prompts = Object.values(promptStats)
+      .map((stats) => ({
+        prompt: stats.prompt,
+        count: stats.count,
+        uniqueUsers: stats.users.size,
+        isQuestion: stats.isQuestion,
+        category: categorizePrompt(stats.prompt),
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, limit);
+
+    return {
+      period: {
+        days,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+      },
+      totalPrompts: events.length,
+      uniquePrompts: Object.keys(promptStats).length,
+      prompts,
     };
   }
 
