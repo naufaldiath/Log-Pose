@@ -8,24 +8,10 @@ import { validateRepoExists } from '../utils/path-safety.js';
  *
  * Worktree structure:
  *   Base repo: /repo-root/myrepo/
- *   Worktrees: /repo-root/myrepo/.worktrees/{sanitizedEmail}/{branch}/
+ *   Worktrees: /repo-root/myrepo/.worktrees/{shortUserId}/{branch}/
  */
 
 const WORKTREES_DIR = '.worktrees';
-
-/**
- * Sanitizes an email address for use in filesystem paths
- * Replaces special characters that could cause issues
- */
-export function sanitizeEmail(email: string): string {
-  // Replace @ with _at_ and . with _dot_
-  // Also remove/replace any other potentially problematic characters
-  return email
-    .toLowerCase()
-    .replace(/@/g, '_at_')
-    .replace(/\./g, '_dot_')
-    .replace(/[^a-z0-9_-]/g, '_');
-}
 
 /**
  * Validates a branch name to prevent path traversal and other attacks
@@ -81,8 +67,8 @@ export function validateBranchName(branch: string): boolean {
  * Gets the worktree path for a given user and branch
  */
 export function getWorktreePath(repoPath: string, userEmail: string, branch: string): string {
-  const sanitizedEmail = sanitizeEmail(userEmail);
-  return path.join(repoPath, WORKTREES_DIR, sanitizedEmail, branch);
+  const shortUserId = getShortUserId(userEmail);
+  return path.join(repoPath, WORKTREES_DIR, shortUserId, branch);
 }
 
 /**
@@ -103,8 +89,8 @@ export async function worktreeExists(repoPath: string, userEmail: string, branch
  * Ensures the worktrees directory structure exists
  */
 async function ensureWorktreesDir(repoPath: string, userEmail: string): Promise<string> {
-  const sanitizedEmail = sanitizeEmail(userEmail);
-  const worktreesBase = path.join(repoPath, WORKTREES_DIR, sanitizedEmail);
+  const shortUserId = getShortUserId(userEmail);
+  const worktreesBase = path.join(repoPath, WORKTREES_DIR, shortUserId);
 
   await fs.mkdir(worktreesBase, { recursive: true });
   return worktreesBase;
@@ -411,8 +397,8 @@ export async function listWorktrees(repoPath: string): Promise<Array<{
  * Gets the worktrees base directory for a user
  */
 export function getUserWorktreesBasePath(repoPath: string, userEmail: string): string {
-  const sanitizedEmail = sanitizeEmail(userEmail);
-  return path.join(repoPath, WORKTREES_DIR, sanitizedEmail);
+  const shortUserId = getShortUserId(userEmail);
+  return path.join(repoPath, WORKTREES_DIR, shortUserId);
 }
 
 /**
