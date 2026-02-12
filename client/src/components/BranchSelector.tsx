@@ -71,6 +71,12 @@ export const BranchSelector: React.FC<BranchSelectorProps> = ({
       return;
     }
 
+    // Prevent creating branches with reserved prefixes
+    if (trimmedName.startsWith('logpose')) {
+      setError('Branch names starting with "logpose" are reserved for internal use');
+      return;
+    }
+
     if (branches.includes(trimmedName)) {
       setError(`Branch '${trimmedName}' already exists`);
       return;
@@ -93,9 +99,11 @@ export const BranchSelector: React.FC<BranchSelectorProps> = ({
     }
   };
 
-  const filteredBranches = branches.filter((b) =>
-    b.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter out logpose branches (internal user isolation branches)
+  // and apply search query
+  const filteredBranches = branches
+    .filter((b) => !b.startsWith('logpose/'))
+    .filter((b) => b.toLowerCase().includes(searchQuery.toLowerCase()));
 
   if (!isOpen) return null;
 

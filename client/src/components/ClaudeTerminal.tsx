@@ -28,6 +28,7 @@ export const ClaudeTerminal: React.FC<ClaudeTerminalProps> = ({ showMobileKeyBar
   const [editingTabId, setEditingTabId] = useState<string | null>(null);
   const [editingTabName, setEditingTabName] = useState('');
   const [showBranchSelector, setShowBranchSelector] = useState(false);
+  const [hasSelectedInitialBranch, setHasSelectedInitialBranch] = useState(false);
 
   const selectedRepo = useAppStore((state) => state.selectedRepo);
   const user = useAppStore((state) => state.user);
@@ -58,6 +59,8 @@ export const ClaudeTerminal: React.FC<ClaudeTerminalProps> = ({ showMobileKeyBar
     const initTabs = async () => {
       if (repoId) {
         await loadTabs(repoId);
+        // Reset branch selection flag when switching repos
+        setHasSelectedInitialBranch(false);
       }
     };
     initTabs();
@@ -66,13 +69,13 @@ export const ClaudeTerminal: React.FC<ClaudeTerminalProps> = ({ showMobileKeyBar
   // Show branch selector for initial session instead of auto-creating
   useEffect(() => {
     const promptForBranch = () => {
-      if (repoId && tabs.length === 0 && !activeTabId && !showBranchSelector) {
+      if (repoId && tabs.length === 0 && !activeTabId && !showBranchSelector && !hasSelectedInitialBranch) {
         console.log('[ClaudeTerminal] Prompting for branch selection');
         setShowBranchSelector(true);
       }
     };
     promptForBranch();
-  }, [repoId, tabs.length, activeTabId, showBranchSelector]);
+  }, [repoId, tabs.length, activeTabId, showBranchSelector, hasSelectedInitialBranch]);
 
   // Debug logging for connection state
   useEffect(() => {
@@ -324,6 +327,9 @@ export const ClaudeTerminal: React.FC<ClaudeTerminalProps> = ({ showMobileKeyBar
   // Handle branch selection
   const handleBranchSelect = async (branch: string) => {
     if (!repoId) return;
+
+    // Set this immediately to prevent the dialog from reopening due to race condition
+    setHasSelectedInitialBranch(true);
 
     console.log('[ClaudeTerminal] Creating new tab for repo:', repoId, 'branch:', branch);
     try {

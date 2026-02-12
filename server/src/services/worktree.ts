@@ -30,6 +30,10 @@ export function sanitizeEmail(email: string): string {
 /**
  * Validates a branch name to prevent path traversal and other attacks
  * Returns true if the branch name is safe to use
+ *
+ * Supports:
+ * - Simple branch names (e.g., "main", "feature-branch")
+ * - Namespaced branch names (e.g., "claude-session/user/main")
  */
 export function validateBranchName(branch: string): boolean {
   if (!branch || branch.length === 0) {
@@ -37,12 +41,13 @@ export function validateBranchName(branch: string): boolean {
   }
 
   // Check for path traversal attempts
-  if (branch.includes('..') || branch.includes('/') || branch.includes('\\')) {
+  if (branch.includes('..') || branch.includes('\\')) {
     return false;
   }
 
   // Check for invalid characters in branch names
   // Git branch names cannot contain: ~ ^ : \ * [ ] space tab
+  // Note: We allow forward slashes for namespaced branches
   if (/[~^:\\\*\[\]\s]/.test(branch)) {
     return false;
   }
@@ -55,6 +60,18 @@ export function validateBranchName(branch: string): boolean {
   // Cannot be @ or contain @{
   if (branch === '@' || branch.includes('@{')) {
     return false;
+  }
+
+  // Validate each path segment for namespaced branches
+  // Each segment must not start or end with a dot, and must not be empty
+  const segments = branch.split('/');
+  for (const segment of segments) {
+    if (segment.length === 0) {
+      return false; // Empty segment (consecutive slashes)
+    }
+    if (segment.startsWith('.') || segment.endsWith('.')) {
+      return false; // Segment starts/ends with dot
+    }
   }
 
   return true;
@@ -94,28 +111,58 @@ async function ensureWorktreesDir(repoPath: string, userEmail: string): Promise<
 }
 
 /**
+ * Extracts a short user identifier from an email address
+ * Uses only the local part (before @) and sanitizes it
+ * Example: "naufaldi.rifqi@mekari.com" -> "naufaldi-rifqi"
+ */
+export function getShortUserId(email: string): string {
+  // Get the local part (before @)
+  const localPart = email.toLowerCase().split('@')[0] || email.toLowerCase();
+  // Replace dots and other special chars with hyphens
+  return localPart.replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+}
+
+/**
+ * Creates a user-specific branch name from a base branch
+ * Format: logpose/{short-user-id}/{base-branch}
+ */
+export function createUserBranchName(userEmail: string, baseBranch: string): string {
+  const shortUserId = getShortUserId(userEmail);
+  return `logpose/${shortUserId}/${baseBranch}`;
+}
+
+/**
  * Creates a worktree for the given user and branch
  * Returns the path to the worktree directory
  *
- * If the branch doesn't exist in the repo, it will be created from the current HEAD
+ * For isolation, this creates a new user-specific branch from the selected base branch,
+ * then creates a worktree from that new branch. This ensures:
+ * - Each user has their own isolated workspace (worktree)
+ * - Each user has their own branch to work on
+ * - No conflicts with other users or the main repo's checked out branch
  */
 export async function createWorktree(
   repoPath: string,
   userEmail: string,
-  branch: string
+  baseBranch: string
 ): Promise<string> {
   if (!(await validateRepoExists(repoPath))) {
     throw new Error(`Repository does not exist: ${repoPath}`);
   }
 
-  if (!validateBranchName(branch)) {
-    throw new Error(`Invalid branch name: ${branch}`);
+  if (!validateBranchName(baseBranch)) {
+    throw new Error(`Invalid branch name: ${baseBranch}`);
   }
 
-  const worktreePath = getWorktreePath(repoPath, userEmail, branch);
+  // Create a user-specific branch name
+  const userBranch = createUserBranchName(userEmail, baseBranch);
+
+  // Use the base branch name for the worktree path (not the user-specific branch)
+  // This makes the path cleaner and consistent
+  const worktreePath = getWorktreePath(repoPath, userEmail, baseBranch);
 
   // Check if worktree already exists
-  if (await worktreeExists(repoPath, userEmail, branch)) {
+  if (await worktreeExists(repoPath, userEmail, baseBranch)) {
     return worktreePath;
   }
 
@@ -124,43 +171,61 @@ export async function createWorktree(
 
   const git = createGit(repoPath);
 
-  // Check if the branch exists in the repo
+  // Check if the base branch exists in the repo
   const branches = await git.branch(['-a']);
-  const branchExists = branches.all.some(
-    b => b === branch || b === `origin/${branch}` || b === `remotes/origin/${branch}`
+  const baseBranchExists = branches.all.some(
+    b => b === baseBranch || b === `origin/${baseBranch}` || b === `remotes/origin/${baseBranch}`
   );
 
-  if (branchExists) {
-    // Create worktree from existing branch
-    await git.raw(['worktree', 'add', worktreePath, branch]);
+  if (!baseBranchExists) {
+    throw new Error(`Base branch '${baseBranch}' does not exist`);
+  }
+
+  // Check if user branch already exists locally
+  const userBranchExists = branches.all.includes(userBranch);
+
+  if (userBranchExists) {
+    // User branch already exists, create worktree from it
+    console.log(`[Worktree] Using existing user branch '${userBranch}'`);
+    await git.raw(['worktree', 'add', worktreePath, userBranch]);
   } else {
-    // Create a new branch and worktree from HEAD
-    await git.raw(['worktree', 'add', '-b', branch, worktreePath]);
+    // Create a new user branch from the base branch and create worktree
+    console.log(`[Worktree] Creating new user branch '${userBranch}' from '${baseBranch}'`);
+    const baseBranchRef = branches.all.includes(baseBranch)
+      ? baseBranch
+      : `origin/${baseBranch}`;
+    await git.raw(['worktree', 'add', '-b', userBranch, worktreePath, baseBranchRef]);
   }
 
   return worktreePath;
 }
 
 /**
- * Creates a worktree from an existing branch (fails if branch doesn't exist)
+ * Creates a worktree from an existing base branch.
+ * Like createWorktree, this creates a user-specific branch for isolation.
+ *
+ * Throws error if the base branch doesn't exist.
  */
 export async function createWorktreeFromBranch(
   repoPath: string,
   userEmail: string,
-  branch: string
+  baseBranch: string
 ): Promise<string> {
   if (!(await validateRepoExists(repoPath))) {
     throw new Error(`Repository does not exist: ${repoPath}`);
   }
 
-  if (!validateBranchName(branch)) {
-    throw new Error(`Invalid branch name: ${branch}`);
+  if (!validateBranchName(baseBranch)) {
+    throw new Error(`Invalid branch name: ${baseBranch}`);
   }
 
-  const worktreePath = getWorktreePath(repoPath, userEmail, branch);
+  // Create a user-specific branch name
+  const userBranch = createUserBranchName(userEmail, baseBranch);
+
+  const worktreePath = getWorktreePath(repoPath, userEmail, baseBranch);
 
   // Check if worktree already exists
-  if (await worktreeExists(repoPath, userEmail, branch)) {
+  if (await worktreeExists(repoPath, userEmail, baseBranch)) {
     return worktreePath;
   }
 
@@ -169,30 +234,42 @@ export async function createWorktreeFromBranch(
 
   const git = createGit(repoPath);
 
-  // Check if the branch exists locally
+  // Check if the base branch exists
   const branches = await git.branch(['-a']);
-  const localBranchExists = branches.all.includes(branch);
-  const remoteBranchExists = branches.all.includes(`origin/${branch}`) ||
-                             branches.all.includes(`remotes/origin/${branch}`);
+  const localBranchExists = branches.all.includes(baseBranch);
+  const remoteBranchExists = branches.all.includes(`origin/${baseBranch}`) ||
+                             branches.all.includes(`remotes/origin/${baseBranch}`);
 
-  if (localBranchExists) {
-    // Create worktree from existing local branch
-    await git.raw(['worktree', 'add', worktreePath, branch]);
-  } else if (remoteBranchExists) {
-    // Create worktree from remote branch, tracking it
-    const remoteBranch = branches.all.includes(`origin/${branch}`)
-      ? `origin/${branch}`
-      : `remotes/origin/${branch}`;
-    await git.raw(['worktree', 'add', '--track', '-b', branch, worktreePath, remoteBranch]);
+  if (!localBranchExists && !remoteBranchExists) {
+    throw new Error(`Branch '${baseBranch}' does not exist`);
+  }
+
+  // Check if user branch already exists locally
+  const userBranchExists = branches.all.includes(userBranch);
+
+  if (userBranchExists) {
+    // User branch already exists, create worktree from it
+    console.log(`[Worktree] Using existing user branch '${userBranch}'`);
+    await git.raw(['worktree', 'add', worktreePath, userBranch]);
+  } else if (localBranchExists) {
+    // Create user branch from local base branch
+    console.log(`[Worktree] Creating user branch '${userBranch}' from local '${baseBranch}'`);
+    await git.raw(['worktree', 'add', '-b', userBranch, worktreePath, baseBranch]);
   } else {
-    throw new Error(`Branch does not exist: ${branch}`);
+    // Create user branch from remote base branch
+    console.log(`[Worktree] Creating user branch '${userBranch}' from remote 'origin/${baseBranch}'`);
+    const remoteBranch = branches.all.includes(`origin/${baseBranch}`)
+      ? `origin/${baseBranch}`
+      : `remotes/origin/${baseBranch}`;
+    await git.raw(['worktree', 'add', '--track', '-b', userBranch, worktreePath, remoteBranch]);
   }
 
   return worktreePath;
 }
 
 /**
- * Creates a worktree with a new branch (creates branch from HEAD)
+ * Creates a worktree with a new branch from HEAD.
+ * The branch name will be prefixed with the user namespace for isolation.
  */
 export async function createWorktreeWithNewBranch(
   repoPath: string,
@@ -207,6 +284,9 @@ export async function createWorktreeWithNewBranch(
     throw new Error(`Invalid branch name: ${branch}`);
   }
 
+  // Create a user-specific branch name
+  const userBranch = createUserBranchName(userEmail, branch);
+
   const worktreePath = getWorktreePath(repoPath, userEmail, branch);
 
   // Check if worktree already exists
@@ -219,14 +299,15 @@ export async function createWorktreeWithNewBranch(
 
   const git = createGit(repoPath);
 
-  // Check if branch already exists locally
+  // Check if user branch already exists locally
   const branches = await git.branch(['-a']);
-  if (branches.all.includes(branch)) {
+  if (branches.all.includes(userBranch)) {
     throw new Error(`Branch already exists: ${branch}`);
   }
 
-  // Create new branch and worktree from HEAD
-  await git.raw(['worktree', 'add', '-b', branch, worktreePath]);
+  // Create new user branch and worktree from HEAD
+  console.log(`[Worktree] Creating new user branch '${userBranch}' from HEAD`);
+  await git.raw(['worktree', 'add', '-b', userBranch, worktreePath]);
 
   return worktreePath;
 }
