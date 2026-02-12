@@ -234,6 +234,8 @@ export const ClaudeTerminal: React.FC<ClaudeTerminalProps> = ({ showMobileKeyBar
 
     ws.onopen = () => {
       console.log('[ClaudeTerminal] WebSocket connected');
+      // Emit connection state for UserMenu
+      window.dispatchEvent(new CustomEvent('terminal-connection-state', { detail: 'connecting' as ConnectionState }));
       // Refit to get correct dimensions before attaching
       if (fitAddon.current) {
         fitAddon.current.fit();
@@ -256,6 +258,8 @@ export const ClaudeTerminal: React.FC<ClaudeTerminalProps> = ({ showMobileKeyBar
         } else if (msg.type === 'status') {
           if (msg.state === 'running') {
             setSessionState('connected');
+            // Emit connection state for UserMenu
+            window.dispatchEvent(new CustomEvent('terminal-connection-state', { detail: 'connected' as ConnectionState }));
             updateTabState(activeTabId, 'running');
           }
           // Update tab name if provided
@@ -282,6 +286,8 @@ export const ClaudeTerminal: React.FC<ClaudeTerminalProps> = ({ showMobileKeyBar
       term.writeln('\n\x1b[31m✗ WebSocket connection error. Check that the server is running.\x1b[0m');
       setError('Connection error - server may be down');
       setSessionState('disconnected');
+      // Emit connection state for UserMenu
+      window.dispatchEvent(new CustomEvent('terminal-connection-state', { detail: 'disconnected' as ConnectionState }));
     };
 
     ws.onclose = (event) => {
@@ -290,6 +296,8 @@ export const ClaudeTerminal: React.FC<ClaudeTerminalProps> = ({ showMobileKeyBar
         setSessionState('disconnected');
         term.writeln('\n\x1b[33m⚠ Disconnected from Claude\x1b[0m');
       }
+      // Emit connection state for UserMenu
+      window.dispatchEvent(new CustomEvent('terminal-connection-state', { detail: 'disconnected' as ConnectionState }));
       wsRef.current = null;
     };
 

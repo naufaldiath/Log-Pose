@@ -9,6 +9,7 @@ import { ResizablePanel } from '@/components/ResizablePanel';
 import { SessionManagerModal } from '@/components/SessionManagerModal';
 import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
 import { AdminPanel } from '@/components/AdminPanel';
+import { UserMenu } from '@/components/UserMenu';
 import {
   Menu,
   Search,
@@ -20,10 +21,9 @@ import {
   FileCode,
   Terminal,
   Keyboard,
-  Settings,
-  BarChart3,
-  Shield
 } from 'lucide-react';
+
+type ConnectionState = 'disconnected' | 'connecting' | 'connected';
 
 function ErrorBanner() {
   const { error, setError } = useAppStore();
@@ -75,7 +75,6 @@ function UnauthorizedScreen() {
 
 function MainLayout() {
   const {
-    user,
     isSidebarOpen,
     toggleSidebar,
     isMobile,
@@ -95,6 +94,24 @@ function MainLayout() {
   });
   // Analytics dashboard state
   const [showAnalytics, setShowAnalytics] = useState(false);
+  // Connection state for terminal WebSocket
+  const [connectionState, setConnectionState] = useState<ConnectionState>('disconnected');
+
+  // Handle custom event to open analytics from UserMenu
+  useEffect(() => {
+    const handleOpenAnalytics = () => setShowAnalytics(true);
+    window.addEventListener('open-analytics', handleOpenAnalytics);
+    return () => window.removeEventListener('open-analytics', handleOpenAnalytics);
+  }, []);
+
+  // Listen for connection state changes from ClaudeTerminal
+  useEffect(() => {
+    const handleConnectionChange = (event: CustomEvent<ConnectionState>) => {
+      setConnectionState(event.detail);
+    };
+    window.addEventListener('terminal-connection-state', handleConnectionChange as EventListener);
+    return () => window.removeEventListener('terminal-connection-state', handleConnectionChange as EventListener);
+  }, []);
 
   // Save keybar state to localStorage
   const toggleKeyBar = () => {
@@ -205,41 +222,8 @@ function MainLayout() {
           </button>
         )}
 
-        {/* Analytics button - admin only */}
-        {user?.isAdmin && (
-          <button
-            onClick={() => setShowAnalytics(true)}
-            className="p-2 hover:bg-midnight-800 rounded text-midnight-300 hover:text-midnight-100"
-            title="Analytics Dashboard"
-          >
-            <BarChart3 size={20} />
-          </button>
-        )}
-
-        {/* Admin Settings button - admin only */}
-        {user?.isAdmin && (
-          <button
-            onClick={() => setAdminPanelOpen(true)}
-            className="p-2 hover:bg-midnight-800 rounded text-midnight-300 hover:text-midnight-100"
-            title="Admin Settings"
-          >
-            <Shield size={20} />
-          </button>
-        )}
-
-        {/* Manage Sessions button */}
-        <button
-          onClick={() => setSessionManagerOpen(true)}
-          className="p-2 hover:bg-midnight-800 rounded text-midnight-300 hover:text-midnight-100"
-          title="Manage Sessions"
-        >
-          <Settings size={20} />
-        </button>
-
-        {/* User info - hidden on mobile */}
-        <div className="text-sm text-midnight-400 hidden md:block truncate max-w-[150px]">
-          {user?.email}
-        </div>
+        {/* User Menu - consolidates all admin/management actions */}
+        <UserMenu connectionState={connectionState} />
       </header>
 
       {/* Main content */}
