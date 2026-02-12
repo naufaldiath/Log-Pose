@@ -512,12 +512,14 @@ export const ClaudeTerminal: React.FC<ClaudeTerminalProps> = ({ showMobileKeyBar
         className="terminal-container"
       />
 
-      {/* Mobile Key Bar */}
+      {/* Mobile Key Bar - only visible on mobile */}
       {showMobileKeyBar && (
-        <MobileKeyBar
-          onKeyPress={handleKeyPress}
-          onFontSizeChange={handleFontSizeChange}
-        />
+        <div className="md:hidden">
+          <MobileKeyBar
+            onKeyPress={handleKeyPress}
+            onFontSizeChange={handleFontSizeChange}
+          />
+        </div>
       )}
 
       {/* Branch Selector Modal */}
